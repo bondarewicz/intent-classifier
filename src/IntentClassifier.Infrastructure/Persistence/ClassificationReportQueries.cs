@@ -9,13 +9,13 @@ using Npgsql;
 internal sealed class ClassificationReportQueries(NpgsqlDataSource dataSource)
     : IClassificationReportQueries
 {
-    // Train before test, explicitly - not relying on the alphabetical sort of the split strings.
     public async Task<IReadOnlyList<SplitSummary>> GetSummary(
         double ambiguousMargin,
         CancellationToken ct = default
     )
     {
         await using var conn = await dataSource.OpenConnectionAsync(ct);
+        // ORDER BY puts train before test explicitly, not by the alphabetical sort of the split strings.
         var rows = await conn.QueryAsync<SplitSummaryRow>(
             new CommandDefinition(
                 $"""

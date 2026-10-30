@@ -7,9 +7,10 @@ using Npgsql;
 
 public sealed record DatasetImportResult(long Intents, long TrainQueries, long TestQueries);
 
-// Loads the Banking77 CSVs (text,category). Streams them into a temp stage with COPY FROM STDIN (client side, nothing mounted into the
-// container), normalizes and validates every row with the domain types, then inserts what is missing.
-// Re-runnable: existing intents and queries (and their embeddings) are kept.
+// Loads the Banking77 CSVs (text,category): streams them into a temp stage with COPY FROM STDIN
+// (client side, nothing mounted into the container), normalizes and validates every row with the
+// domain types, then inserts what is missing. Re-runnable: existing intents and queries (and their
+// embeddings) are kept.
 public sealed class Banking77Importer(NpgsqlDataSource dataSource)
 {
     private const string Stage = "banking77_stage";

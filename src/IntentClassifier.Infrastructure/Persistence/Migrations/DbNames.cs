@@ -1,6 +1,6 @@
 namespace IntentClassifier.Infrastructure.Persistence.Migrations;
 
-// Names used by migrations. Migrations keep their own constants (not the *Schema classes) so an
+// Names used by migrations. Migrations keep their own constants (not Persistence/Schema.cs) so an
 // applied migration never changes when a row property is renamed later.
 internal static class DbNames
 {

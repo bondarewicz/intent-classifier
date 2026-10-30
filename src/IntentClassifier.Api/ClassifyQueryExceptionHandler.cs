@@ -16,7 +16,7 @@ internal sealed class ClassifyQueryExceptionHandler(IProblemDetailsService probl
         CancellationToken ct
     )
     {
-        ProblemDetails? problem = exception switch
+        var problem = exception switch
         {
             InvalidQueryException e => new ValidationProblemDetails(
                 new Dictionary<string, string[]> { ["query"] = [e.Message] }
