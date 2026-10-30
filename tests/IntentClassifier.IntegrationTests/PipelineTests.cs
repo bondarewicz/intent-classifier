@@ -1,6 +1,5 @@
 namespace IntentClassifier.IntegrationTests;
 
-using Application.Abstractions;
 using Application.Classification;
 using Application.Embeddings;
 using Application.Evaluation;
@@ -8,6 +7,7 @@ using Application.Intents;
 using Application.Queries;
 using Domain.Intents;
 using Domain.Queries;
+using Infrastructure.Persistence;
 using Microsoft.Extensions.DependencyInjection;
 
 // Runs the real migrations, COPY import, Dapper repositories and pgvector SQL end to end, against
@@ -19,13 +19,13 @@ public sealed class PipelineTests(PostgresFixture db) : IClassFixture<PostgresFi
         where T : notnull => db.Services!.GetRequiredService<T>();
 
     [Fact]
-    public void Migrations_are_idempotent() => Get<IDatabaseMigrator>().MigrateUp();
+    public void Migrations_are_idempotent() => Get<DatabaseMigrator>().MigrateUp();
 
     [Fact]
     public async Task Seed_is_idempotent()
     {
         // labels canonicalized, duplicate train text collapsed, the train/test overlap kept in both
-        var seeded = await Get<IDatasetImporter>().ImportBanking77(db.TrainCsv, db.TestCsv);
+        var seeded = await Get<Banking77Importer>().ImportBanking77(db.TrainCsv, db.TestCsv);
         Assert.Equal(new DatasetImportResult(Intents: 4, TrainQueries: 10, TestQueries: 5), seeded);
     }
 

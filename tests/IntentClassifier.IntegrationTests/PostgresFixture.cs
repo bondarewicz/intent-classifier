@@ -5,6 +5,7 @@ using Application.Abstractions;
 using Application.Embeddings;
 using Application.Intents;
 using Infrastructure;
+using Infrastructure.Persistence;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Testcontainers.PostgreSql;
@@ -54,8 +55,8 @@ public sealed class PostgresFixture : IAsyncLifetime
         await File.WriteAllTextAsync(TrainCsv, Banking77TestData.Train);
         await File.WriteAllTextAsync(TestCsv, Banking77TestData.Test);
 
-        services.GetRequiredService<IDatabaseMigrator>().MigrateUp();
-        await services.GetRequiredService<IDatasetImporter>().ImportBanking77(TrainCsv, TestCsv);
+        services.GetRequiredService<DatabaseMigrator>().MigrateUp();
+        await services.GetRequiredService<Banking77Importer>().ImportBanking77(TrainCsv, TestCsv);
         await services.GetRequiredService<EmbedDatasetHandler>().Handle(batchSize: 4);
         await services.GetRequiredService<TrainIntentsHandler>().Handle();
     }

@@ -1,18 +1,18 @@
 namespace IntentClassifier.Cli;
 
-using Application.Abstractions;
 using Application.Classification;
 using Application.Embeddings;
 using Application.Evaluation;
 using Application.Intents;
 using Application.Queries;
+using Infrastructure.Persistence;
 using Microsoft.Extensions.DependencyInjection;
 
 internal static class Commands
 {
     public static int Migrate(IServiceProvider services)
     {
-        services.GetRequiredService<IDatabaseMigrator>().MigrateUp();
+        services.GetRequiredService<DatabaseMigrator>().MigrateUp();
         Console.WriteLine("Database is at the latest migration.");
         return 0;
     }
@@ -20,7 +20,7 @@ internal static class Commands
     public static async Task<int> Seed(IServiceProvider services, CliOptions options)
     {
         var result = await services
-            .GetRequiredService<IDatasetImporter>()
+            .GetRequiredService<Banking77Importer>()
             .ImportBanking77(options.TrainPath, options.TestPath);
         Console.WriteLine(
             $"Intents: {result.Intents}, train queries: {result.TrainQueries:N0}, test queries: {result.TestQueries:N0}"

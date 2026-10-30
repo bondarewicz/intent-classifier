@@ -40,10 +40,10 @@ public static class DependencyInjection
         services.AddSingleton<IClassifiedQueryLog, ClassifiedQueryLog>();
         services.AddSingleton<IIntentCandidateProjection, IntentCandidateProjection>();
         services.AddSingleton<IClassificationReportQueries, ClassificationReportQueries>();
-        services.AddSingleton<IDatasetImporter, Banking77Importer>();
+        services.AddSingleton<Banking77Importer>();
 
         DatabaseMigrator.AddTo(services);
-        services.AddSingleton<IDatabaseMigrator, DatabaseMigrator>();
+        services.AddSingleton<DatabaseMigrator>();
 
         services
             .AddOptions<OpenAiOptions>()

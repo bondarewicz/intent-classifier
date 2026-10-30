@@ -1,12 +1,11 @@
 namespace IntentClassifier.Infrastructure.Persistence;
 
-using Application.Abstractions;
 using FluentMigrator.Runner;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Migrations;
 
-internal sealed class DatabaseMigrator(IServiceScopeFactory scopes) : IDatabaseMigrator
+public sealed class DatabaseMigrator(IServiceScopeFactory scopes)
 {
     public void MigrateUp()
     {

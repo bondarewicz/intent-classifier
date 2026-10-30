@@ -1,4 +1,4 @@
-namespace IntentClassifier.Application.Abstractions;
+namespace IntentClassifier.Infrastructure;
 
 // Required configuration (a connection string, an API setting) is missing or blank. Distinct
 // from InvalidOperationException so callers can catch this specific, expected startup failure

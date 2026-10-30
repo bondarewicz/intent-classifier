@@ -1,8 +1,8 @@
 using IntentClassifier.Api;
 using IntentClassifier.Api.Endpoints;
 using IntentClassifier.Application;
-using IntentClassifier.Application.Abstractions;
 using IntentClassifier.Infrastructure;
+using IntentClassifier.Infrastructure.Persistence;
 using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -31,7 +31,7 @@ _ = app.Services.GetRequiredService<NpgsqlDataSource>();
 app.UseExceptionHandler();
 
 if (app.Configuration.GetValue("Database:AutoMigrate", false))
-    app.Services.GetRequiredService<IDatabaseMigrator>().MigrateUp();
+    app.Services.GetRequiredService<DatabaseMigrator>().MigrateUp();
 
 if (app.Environment.IsDevelopment())
     app.MapOpenApi();

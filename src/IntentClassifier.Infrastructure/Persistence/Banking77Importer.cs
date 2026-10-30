@@ -1,15 +1,16 @@
 namespace IntentClassifier.Infrastructure.Persistence;
 
-using Application.Abstractions;
 using Dapper;
 using Domain.Intents;
 using Domain.Queries;
 using Npgsql;
 
-// Streams the CSVs into a temp stage with COPY FROM STDIN (client side, nothing mounted into the
+public sealed record DatasetImportResult(long Intents, long TrainQueries, long TestQueries);
+
+// Loads the Banking77 CSVs (text,category). Streams them into a temp stage with COPY FROM STDIN (client side, nothing mounted into the
 // container), normalizes and validates every row with the domain types, then inserts what is missing.
 // Re-runnable: existing intents and queries (and their embeddings) are kept.
-internal sealed class Banking77Importer(NpgsqlDataSource dataSource) : IDatasetImporter
+public sealed class Banking77Importer(NpgsqlDataSource dataSource)
 {
     private const string Stage = "banking77_stage";
 
