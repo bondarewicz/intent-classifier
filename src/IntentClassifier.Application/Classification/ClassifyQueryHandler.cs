@@ -1,10 +1,11 @@
-namespace IntentClassifier.Application.Queries;
+namespace IntentClassifier.Application.Classification;
 
 using Abstractions;
 using Domain.Classification;
 using Domain.Embeddings;
 using Domain.Intents;
 using Domain.Queries;
+using Queries;
 
 public enum EmbeddingSource
 {

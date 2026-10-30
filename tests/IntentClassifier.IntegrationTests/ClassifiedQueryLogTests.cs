@@ -1,5 +1,6 @@
 namespace IntentClassifier.IntegrationTests;
 
+using Application.Classification;
 using Application.Intents;
 using Application.Queries;
 using Dapper;

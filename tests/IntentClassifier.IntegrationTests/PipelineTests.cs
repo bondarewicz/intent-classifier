@@ -4,7 +4,6 @@ using Application.Classification;
 using Application.Embeddings;
 using Application.Evaluation;
 using Application.Intents;
-using Application.Queries;
 using Domain.Intents;
 using Domain.Queries;
 using Infrastructure.Persistence;

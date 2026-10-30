@@ -1,7 +1,7 @@
 namespace IntentClassifier.UnitTests.Application;
 
 using IntentClassifier.Application.Abstractions;
-using IntentClassifier.Application.Queries;
+using IntentClassifier.Application.Classification;
 using IntentClassifier.Domain.Embeddings;
 using IntentClassifier.Domain.Intents;
 using IntentClassifier.Domain.Queries;

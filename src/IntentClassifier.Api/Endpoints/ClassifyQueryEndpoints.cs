@@ -1,6 +1,6 @@
 namespace IntentClassifier.Api.Endpoints;
 
-using Application.Queries;
+using Application.Classification;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 public static class ClassifyQueryEndpoints

@@ -1,6 +1,6 @@
 namespace IntentClassifier.Api.Endpoints;
 
-using Application.Queries;
+using Application.Classification;
 
 public sealed record ClassifyQueryRequest(string? Query);
 
@@ -25,8 +25,8 @@ public sealed record ClassifyQueryResponse(
             result.Text.Value,
             result.EmbeddingSource switch
             {
-                Application.Queries.EmbeddingSource.Stored => "stored",
-                Application.Queries.EmbeddingSource.Generated => "openai",
+                Application.Classification.EmbeddingSource.Stored => "stored",
+                Application.Classification.EmbeddingSource.Generated => "openai",
                 _ => throw new ArgumentOutOfRangeException(nameof(result)),
             },
             result.IsAmbiguous,
