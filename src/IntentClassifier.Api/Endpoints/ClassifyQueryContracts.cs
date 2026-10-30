@@ -4,7 +4,7 @@ using IntentClassifier.Application.Queries;
 
 public sealed record ClassifyQueryRequest(string? Query);
 
-public sealed record IntentMatchResponse(
+public sealed record IntentCandidateResponse(
     int Rank,
     string IntentId,
     string IntentName,
@@ -16,7 +16,7 @@ public sealed record ClassifyQueryResponse(
     string NormalizedQuery,
     string EmbeddingSource,
     bool Ambiguous,
-    IReadOnlyList<IntentMatchResponse> Matches
+    IReadOnlyList<IntentCandidateResponse> Candidates
 )
 {
     public static ClassifyQueryResponse From(ClassifyQueryResult result) =>
@@ -31,7 +31,7 @@ public sealed record ClassifyQueryResponse(
             },
             result.IsAmbiguous,
             result
-                .Matches.Select(m => new IntentMatchResponse(
+                .Candidates.Select(m => new IntentCandidateResponse(
                     m.Rank,
                     m.IntentId.Value,
                     m.IntentName,

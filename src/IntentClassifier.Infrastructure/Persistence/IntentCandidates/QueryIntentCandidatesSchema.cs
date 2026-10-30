@@ -1,12 +1,12 @@
-namespace IntentClassifier.Infrastructure.Persistence.IntentMatches;
+namespace IntentClassifier.Infrastructure.Persistence.IntentCandidates;
 
 using IntentClassifier.Domain.Intents;
 using IntentClassifier.Infrastructure.Persistence.Intents;
 using IntentClassifier.Infrastructure.Persistence.LabelledQueries;
 
-internal static class QueryIntentMatchesSchema
+internal static class QueryIntentCandidatesSchema
 {
-    public const string Table = "query_intent_matches";
+    public const string Table = "query_intent_candidates";
 
     public static class Sql
     {
@@ -18,7 +18,7 @@ internal static class QueryIntentMatchesSchema
         public static readonly string Count = $"SELECT count(*) FROM {Table}";
 
         // Set-based: pgvector computes queries x intents cosine distances in one statement.
-        public static string InsertTopMatches(IntentRepresentation representation)
+        public static string InsertTopCandidates(IntentRepresentation representation)
         {
             var intentEmbedding = $"i.{IntentsSchema.EmbeddingColumn(representation)}";
             var distance = $"{intentEmbedding} <=> q.embedding";

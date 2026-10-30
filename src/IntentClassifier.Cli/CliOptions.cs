@@ -18,7 +18,7 @@ internal sealed record CliOptions(
           IntentClassifier.Cli seed [--train data/banking77/train.csv] [--test data/banking77/test.csv]
           IntentClassifier.Cli embed [--batch 1000]
           IntentClassifier.Cli train
-          IntentClassifier.Cli match [--top 5] [--by centroid|name]
+          IntentClassifier.Cli classify-all [--top 5] [--by centroid|name]
           IntentClassifier.Cli evaluate
           IntentClassifier.Cli classify "<customer query>" [--top 3] [--by centroid|name]
           IntentClassifier.Cli label "<customer query>" <intent_id>

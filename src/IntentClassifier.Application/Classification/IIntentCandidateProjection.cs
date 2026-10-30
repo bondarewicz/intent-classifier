@@ -1,9 +1,9 @@
-namespace IntentClassifier.Application.Matching;
+namespace IntentClassifier.Application.Classification;
 
 using IntentClassifier.Domain.Intents;
 
-// Rebuilds the stored top-K intent matches for every query in the dataset.
-public interface IIntentMatchProjection
+// Rebuilds the stored top-K intent candidates for every query in the dataset.
+public interface IIntentCandidateProjection
 {
     Task<long> RebuildAll(
         int top,

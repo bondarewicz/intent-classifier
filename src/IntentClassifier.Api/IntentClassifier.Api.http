@@ -2,18 +2,18 @@
 
 ### Every call below is also upserted into classified_queries (the query
 ### log): the embedding is written once, times_classified and the best
-### match refresh on every repeat. A query that was generated here will
+### candidate refresh on every repeat. A query that was generated here will
 ### report "stored" (no OpenAI call) the next time the same text is sent -
 ### promoting a logged query into labelled_queries is CLI-only (`label`),
 ### never via this endpoint.
 
-### Confident match: a known test query, well ahead of the runner-up (no OpenAI call)
+### Confident classification: a known test query, well ahead of the runner-up (no OpenAI call)
 POST {{host}}/queries/classify
 Content-Type: application/json
 
 { "query": "How do I locate my card?" }
 
-### Ambiguous match: margin between rank 1 and 2 is under 0.02 (no OpenAI call)
+### Ambiguous classification: margin between rank 1 and 2 is under 0.02 (no OpenAI call)
 POST {{host}}/queries/classify
 Content-Type: application/json
 
@@ -29,7 +29,7 @@ Content-Type: application/json
 
 ### Request shape: "query" is the only field the endpoint reads. There is
 ### no top/representation parameter over HTTP - those are CLI-only knobs;
-### the endpoint always asks for the top 3 matches by centroid (no OpenAI call)
+### the endpoint always asks for the top 3 candidates by centroid (no OpenAI call)
 POST {{host}}/queries/classify
 Content-Type: application/json
 
@@ -43,7 +43,7 @@ Content-Type: application/json
 
 { "query": "the barista charged me twice for one iced latte" }
 
-### Off-topic: nothing in Banking77 is close, so every match has low
+### Off-topic: nothing in Banking77 is close, so every candidate has low
 ### similarity (calls OpenAI)
 POST {{host}}/queries/classify
 Content-Type: application/json

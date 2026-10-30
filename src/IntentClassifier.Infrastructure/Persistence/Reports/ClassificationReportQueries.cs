@@ -1,14 +1,14 @@
 namespace IntentClassifier.Infrastructure.Persistence.Reports;
 
 using Dapper;
+using IntentClassifier.Application.Classification;
 using IntentClassifier.Application.Evaluation;
-using IntentClassifier.Application.Matching;
 using IntentClassifier.Domain.Intents;
 using IntentClassifier.Domain.Queries;
 using Npgsql;
 
-internal sealed class MatchReportQueries(NpgsqlDataSource dataSource)
-    : IMatchReportQueries,
+internal sealed class ClassificationReportQueries(NpgsqlDataSource dataSource)
+    : IClassificationReportQueries,
         IEvaluationQueries
 {
     public async Task<IReadOnlyList<SplitSummary>> GetSummary(
@@ -19,7 +19,7 @@ internal sealed class MatchReportQueries(NpgsqlDataSource dataSource)
         await using var conn = await dataSource.OpenConnectionAsync(ct);
         var rows = await conn.QueryAsync<SplitSummaryRow>(
             new CommandDefinition(
-                QueryMatchReportSchema.Sql.SelectSummaryBySplit,
+                QueryClassificationReportSchema.Sql.SelectSummaryBySplit,
                 new { Margin = ambiguousMargin },
                 cancellationToken: ct
             )
@@ -45,7 +45,7 @@ internal sealed class MatchReportQueries(NpgsqlDataSource dataSource)
         await using var conn = await dataSource.OpenConnectionAsync(ct);
         var row = await conn.QuerySingleAsync<EvaluationRow>(
             new CommandDefinition(
-                QueryMatchReportSchema.Sql.Evaluate(representation),
+                QueryClassificationReportSchema.Sql.Evaluate(representation),
                 new
                 {
                     Split = split.ToDb(),

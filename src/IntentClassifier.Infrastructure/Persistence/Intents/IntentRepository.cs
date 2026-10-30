@@ -1,9 +1,9 @@
 namespace IntentClassifier.Infrastructure.Persistence.Intents;
 
 using Dapper;
+using IntentClassifier.Domain.Classification;
 using IntentClassifier.Domain.Embeddings;
 using IntentClassifier.Domain.Intents;
-using IntentClassifier.Domain.Matching;
 using Npgsql;
 
 internal sealed class IntentRepository(NpgsqlDataSource dataSource) : IIntentRepository
@@ -53,7 +53,7 @@ internal sealed class IntentRepository(NpgsqlDataSource dataSource) : IIntentRep
         );
     }
 
-    public async Task<IReadOnlyList<IntentMatch>> FindClosest(
+    public async Task<IReadOnlyList<IntentCandidate>> FindClosest(
         Embedding embedding,
         int top,
         IntentRepresentation representation,
@@ -61,14 +61,14 @@ internal sealed class IntentRepository(NpgsqlDataSource dataSource) : IIntentRep
     )
     {
         await using var conn = await dataSource.OpenConnectionAsync(ct);
-        var rows = await conn.QueryAsync<IntentMatchRow>(
+        var rows = await conn.QueryAsync<IntentCandidateRow>(
             new CommandDefinition(
                 IntentsSchema.Sql.SelectClosest(representation),
                 new { Embedding = embedding.ToVector(), Top = top },
                 cancellationToken: ct
             )
         );
-        return rows.Select(r => r.MapToIntentMatch()).ToList();
+        return rows.Select(r => r.MapToIntentCandidate()).ToList();
     }
 }
 
@@ -77,6 +77,6 @@ internal static class IntentRowExtensions
     public static Intent MapToIntent(this IntentRow row) =>
         new(IntentId.Create(row.IntentId), row.IntentName, row.NameEmbedding?.ToEmbedding());
 
-    public static IntentMatch MapToIntentMatch(this IntentMatchRow row) =>
+    public static IntentCandidate MapToIntentCandidate(this IntentCandidateRow row) =>
         new(row.Rank, IntentId.Create(row.IntentId), row.IntentName, row.Similarity);
 }

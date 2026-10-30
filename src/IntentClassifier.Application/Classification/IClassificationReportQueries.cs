@@ -1,4 +1,4 @@
-namespace IntentClassifier.Application.Matching;
+namespace IntentClassifier.Application.Classification;
 
 using IntentClassifier.Domain.Queries;
 
@@ -10,8 +10,8 @@ public sealed record SplitSummary(
     long Ambiguous
 );
 
-// Read side over the stored matches (query_match_report).
-public interface IMatchReportQueries
+// Read side over the stored candidates (query_classification_report).
+public interface IClassificationReportQueries
 {
     Task<IReadOnlyList<SplitSummary>> GetSummary(
         double ambiguousMargin,

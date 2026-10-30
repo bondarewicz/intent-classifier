@@ -10,8 +10,8 @@ On the held-out Banking77 test split (3,079 queries):
 | **Centroid** of its train query embeddings (default) | **88.9%** | **97.2%** | 9.3% |
 | Embedding of its name only | 62.2% | 79.1% | 21.6% |
 
-\* best intent less than 0.02 ahead of the runner-up (`MatchConfidence.AmbiguousMargin`). Top-1 drops to
-49.8% on ambiguous matches vs 92.9% on confident ones - that is where a second opinion (e.g. an LLM) would pay off.
+\* best intent less than 0.02 ahead of the runner-up (`ClassificationConfidence.AmbiguousMargin`). Top-1 drops to
+49.8% on ambiguous classifications vs 92.9% on confident ones - that is where a second opinion (e.g. an LLM) would pay off.
 
 ## Dataset
 
@@ -26,11 +26,11 @@ Dependencies point inwards: Domain ← Application ← Infrastructure, with Api 
 
 | Project | Responsibility |
 |---|---|
-| `src/IntentClassifier.Domain` | Model and rules (`QueryText`, `IntentId`, `Intent`, `Embedding`, `MatchConfidence`), repository interfaces |
-| `src/IntentClassifier.Application` | Use-case handlers (classify, embed, train, match, evaluate) and ports |
+| `src/IntentClassifier.Domain` | Model and rules (`QueryText`, `IntentId`, `Intent`, `Embedding`, `ClassificationConfidence`), repository interfaces |
+| `src/IntentClassifier.Application` | Use-case handlers (classify, embed, train, classify-all, evaluate) and ports |
 | `src/IntentClassifier.Infrastructure` | Dapper + Npgsql + pgvector, FluentMigrator migrations, Banking77 COPY importer, OpenAI embedder |
 | `src/IntentClassifier.Api` | Minimal API: `POST /queries/classify` |
-| `src/IntentClassifier.Cli` | `migrate`, `seed`, `embed`, `train`, `match`, `evaluate`, `classify`, `label` |
+| `src/IntentClassifier.Cli` | `migrate`, `seed`, `embed`, `train`, `classify-all`, `evaluate`, `classify`, `label` |
 | `tests/IntentClassifier.UnitTests` | Domain rules and use cases with in-memory fakes |
 | `tests/IntentClassifier.IntegrationTests` | Full pipeline against a Testcontainers pgvector Postgres with a fake embedder |
 
@@ -46,12 +46,12 @@ docker compose up -d --wait      # pgvector Postgres on localhost:5435
 dotnet user-secrets --project src/IntentClassifier.Cli set "OpenAi:ApiKey" "<key>"   # shared with the API
 
 CLI="dotnet run --project src/IntentClassifier.Cli --"
-$CLI migrate    # schema (idempotent)
-$CLI seed       # load data/banking77/{train,test}.csv
-$CLI embed      # ~13k queries + 77 intent names, < 1 cent
-$CLI train      # intent centroids
-$CLI match      # top-5 intents per query, accuracy per split
-$CLI evaluate   # centroid vs name accuracy on the test split
+$CLI migrate      # schema (idempotent)
+$CLI seed         # load data/banking77/{train,test}.csv
+$CLI embed        # ~13k queries + 77 intent names, < 1 cent
+$CLI train        # intent centroids
+$CLI classify-all # top-5 intents per query, accuracy per split
+$CLI evaluate     # centroid vs name accuracy on the test split
 ```
 
 ```sh
@@ -97,7 +97,7 @@ curl -s -X POST http://localhost:5235/queries/classify \
   "normalizedQuery": "where is the virtual card?",
   "embeddingSource": "stored",
   "ambiguous": false,
-  "matches": [
+  "candidates": [
     { "rank": 1, "intentId": "getting_virtual_card", "intentName": "Getting virtual card", "similarity": 0.9143 },
     { "rank": 2, "intentId": "virtual_card_not_working", "intentName": "Virtual card not working", "similarity": 0.7809 }
   ]

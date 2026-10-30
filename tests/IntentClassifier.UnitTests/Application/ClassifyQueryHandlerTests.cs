@@ -96,7 +96,7 @@ public sealed class ClassifyQueryHandlerTests
 
         Assert.Equal(EmbeddingSource.Generated, result.EmbeddingSource);
         Assert.Equal(["charged twice for coffee"], generator.Requested);
-        Assert.Equal([1, 2, 3], result.Matches.Select(m => m.Rank));
+        Assert.Equal([1, 2, 3], result.Candidates.Select(m => m.Rank));
     }
 
     [Fact]
@@ -202,7 +202,7 @@ public sealed class ClassifyQueryHandlerTests
     }
 
     [Fact]
-    public async Task Flags_ambiguity_even_when_only_the_best_match_is_requested()
+    public async Task Flags_ambiguity_even_when_only_the_best_candidate_is_requested()
     {
         var intents = new FakeIntentRepository { Similarities = [0.80, 0.79, 0.5] };
         var handler = new ClassifyQueryHandler(
@@ -215,12 +215,12 @@ public sealed class ClassifyQueryHandlerTests
         var result = await handler.Handle("refund", top: 1);
 
         Assert.True(result.IsAmbiguous);
-        Assert.Single(result.Matches);
+        Assert.Single(result.Candidates);
         Assert.Equal(2, intents.LastTop);
     }
 
     [Fact]
-    public async Task Zero_matches_are_recorded_with_no_best_and_not_ambiguous()
+    public async Task Zero_candidates_are_recorded_with_no_best_and_not_ambiguous()
     {
         var log = new InMemoryClassifiedQueryLog();
         var handler = new ClassifyQueryHandler(
@@ -232,7 +232,7 @@ public sealed class ClassifyQueryHandlerTests
 
         var result = await handler.Handle("refund", top: 3);
 
-        Assert.Empty(result.Matches);
+        Assert.Empty(result.Candidates);
         Assert.False(result.IsAmbiguous);
         var recorded = log.RecordedCalls[0];
         Assert.Null(recorded.BestIntentId);

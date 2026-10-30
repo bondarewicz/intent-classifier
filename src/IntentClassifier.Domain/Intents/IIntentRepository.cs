@@ -1,7 +1,7 @@
 namespace IntentClassifier.Domain.Intents;
 
+using IntentClassifier.Domain.Classification;
 using IntentClassifier.Domain.Embeddings;
-using IntentClassifier.Domain.Matching;
 
 public interface IIntentRepository
 {
@@ -13,7 +13,7 @@ public interface IIntentRepository
     Task<int> RecomputeCentroids(CancellationToken ct = default);
 
     // Intents ordered by cosine similarity to the embedding, closest first.
-    Task<IReadOnlyList<IntentMatch>> FindClosest(
+    Task<IReadOnlyList<IntentCandidate>> FindClosest(
         Embedding embedding,
         int top,
         IntentRepresentation representation,

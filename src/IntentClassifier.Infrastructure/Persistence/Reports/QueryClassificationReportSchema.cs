@@ -4,9 +4,9 @@ using IntentClassifier.Domain.Intents;
 using IntentClassifier.Infrastructure.Persistence.Intents;
 using IntentClassifier.Infrastructure.Persistence.LabelledQueries;
 
-internal static class QueryMatchReportSchema
+internal static class QueryClassificationReportSchema
 {
-    public const string View = "query_match_report";
+    public const string View = "query_classification_report";
 
     public static class Sql
     {

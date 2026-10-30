@@ -18,7 +18,7 @@ public sealed class ClassifyEndpointTests(PostgresFixture db) : IClassFixture<Po
         "Host=127.0.0.1;Port=1;Database=x;Username=x;Password=x;Pooling=false";
 
     [Fact]
-    public async Task Classify_returns_ranked_matches_for_a_known_query()
+    public async Task Classify_returns_ranked_candidates_for_a_known_query()
     {
         using var api = CreateApi(swapGenerator: true);
 
@@ -30,7 +30,7 @@ public sealed class ClassifyEndpointTests(PostgresFixture db) : IClassFixture<Po
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var body = await response.Content.ReadFromJsonAsync<ClassifyQueryResponse>();
         Assert.NotNull(body);
-        Assert.Equal("card_arrival", body!.Matches[0].IntentId);
+        Assert.Equal("card_arrival", body!.Candidates[0].IntentId);
     }
 
     [Fact]

@@ -1,6 +1,6 @@
 namespace IntentClassifier.Infrastructure.Persistence.Reports;
 
-// Projection of the per-split summary over the query_match_report view.
+// Projection of the per-split summary over the query_classification_report view.
 internal sealed class SplitSummaryRow
 {
     public string Split { get; set; } = "";
@@ -20,8 +20,8 @@ internal sealed class EvaluationRow
     public long AmbiguousTop1Correct { get; set; }
 }
 
-// Shape of the columns the report queries actually read from the query_match_report view.
-internal sealed class QueryMatchReportRow
+// Shape of the columns the report queries actually read from the query_classification_report view.
+internal sealed class QueryClassificationReportRow
 {
     public string Split { get; set; } = "";
     public double BestSimilarity { get; set; }

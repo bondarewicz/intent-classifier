@@ -2,9 +2,9 @@ namespace IntentClassifier.UnitTests.Application;
 
 using IntentClassifier.Application.Abstractions;
 using IntentClassifier.Application.Queries;
+using IntentClassifier.Domain.Classification;
 using IntentClassifier.Domain.Embeddings;
 using IntentClassifier.Domain.Intents;
-using IntentClassifier.Domain.Matching;
 using IntentClassifier.Domain.Queries;
 
 internal sealed class InMemoryLabelledQueryRepository(params LabelledQuery[] queries)
@@ -52,7 +52,7 @@ internal sealed class FakeIntentRepository(params Intent[] intents) : IIntentRep
     public Task<int> RecomputeCentroids(CancellationToken ct = default) =>
         Task.FromResult(Intents.Count);
 
-    public Task<IReadOnlyList<IntentMatch>> FindClosest(
+    public Task<IReadOnlyList<IntentCandidate>> FindClosest(
         Embedding embedding,
         int top,
         IntentRepresentation representation,
@@ -62,14 +62,19 @@ internal sealed class FakeIntentRepository(params Intent[] intents) : IIntentRep
         LastQuery = embedding;
         LastTop = top;
         LastRepresentation = representation;
-        IReadOnlyList<IntentMatch> matches = Similarities
+        IReadOnlyList<IntentCandidate> candidates = Similarities
             .Take(top)
             .Select(
                 (s, i) =>
-                    new IntentMatch(i + 1, IntentId.Create($"intent_{i + 1}"), $"Intent {i + 1}", s)
+                    new IntentCandidate(
+                        i + 1,
+                        IntentId.Create($"intent_{i + 1}"),
+                        $"Intent {i + 1}",
+                        s
+                    )
             )
             .ToList();
-        return Task.FromResult(matches);
+        return Task.FromResult(candidates);
     }
 }
 

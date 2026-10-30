@@ -1,7 +1,7 @@
 namespace IntentClassifier.Application.Evaluation;
 
+using IntentClassifier.Domain.Classification;
 using IntentClassifier.Domain.Intents;
-using IntentClassifier.Domain.Matching;
 using IntentClassifier.Domain.Queries;
 
 // Accuracy of each intent representation on the held-out test split.
@@ -18,7 +18,7 @@ public sealed class EvaluateHandler(IEvaluationQueries evaluation)
                 await evaluation.Evaluate(
                     representation,
                     DatasetSplit.Test,
-                    MatchConfidence.AmbiguousMargin,
+                    ClassificationConfidence.AmbiguousMargin,
                     TopN,
                     ct
                 )

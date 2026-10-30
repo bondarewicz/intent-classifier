@@ -14,7 +14,7 @@ internal sealed class IntentRow
 }
 
 // Projection returned by the nearest-intent search.
-internal sealed class IntentMatchRow
+internal sealed class IntentCandidateRow
 {
     public int Rank { get; set; }
     public string IntentId { get; set; } = "";

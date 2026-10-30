@@ -1,9 +1,9 @@
 namespace IntentClassifier.Application;
 
+using IntentClassifier.Application.Classification;
 using IntentClassifier.Application.Embeddings;
 using IntentClassifier.Application.Evaluation;
 using IntentClassifier.Application.Intents;
-using IntentClassifier.Application.Matching;
 using IntentClassifier.Application.Queries;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -15,6 +15,6 @@ public static class DependencyInjection
             .AddTransient<ConfirmLabelHandler>()
             .AddTransient<EmbedDatasetHandler>()
             .AddTransient<TrainIntentsHandler>()
-            .AddTransient<RecomputeMatchesHandler>()
+            .AddTransient<ClassifyAllHandler>()
             .AddTransient<EvaluateHandler>();
 }

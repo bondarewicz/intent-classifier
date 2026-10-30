@@ -1,8 +1,8 @@
 namespace IntentClassifier.Infrastructure;
 
 using IntentClassifier.Application.Abstractions;
+using IntentClassifier.Application.Classification;
 using IntentClassifier.Application.Evaluation;
-using IntentClassifier.Application.Matching;
 using IntentClassifier.Application.Queries;
 using IntentClassifier.Domain.Intents;
 using IntentClassifier.Domain.Queries;
@@ -10,7 +10,7 @@ using IntentClassifier.Infrastructure.Embeddings;
 using IntentClassifier.Infrastructure.Persistence;
 using IntentClassifier.Infrastructure.Persistence.ClassifiedQueries;
 using IntentClassifier.Infrastructure.Persistence.Import;
-using IntentClassifier.Infrastructure.Persistence.IntentMatches;
+using IntentClassifier.Infrastructure.Persistence.IntentCandidates;
 using IntentClassifier.Infrastructure.Persistence.Intents;
 using IntentClassifier.Infrastructure.Persistence.LabelledQueries;
 using IntentClassifier.Infrastructure.Persistence.Reports;
@@ -45,13 +45,13 @@ public static class DependencyInjection
         services.AddSingleton<IIntentRepository, IntentRepository>();
         services.AddSingleton<ILabelledQueryRepository, LabelledQueryRepository>();
         services.AddSingleton<IClassifiedQueryLog, ClassifiedQueryLog>();
-        services.AddSingleton<IIntentMatchProjection, IntentMatchProjection>();
-        services.AddSingleton<MatchReportQueries>();
-        services.AddSingleton<IMatchReportQueries>(sp =>
-            sp.GetRequiredService<MatchReportQueries>()
+        services.AddSingleton<IIntentCandidateProjection, IntentCandidateProjection>();
+        services.AddSingleton<ClassificationReportQueries>();
+        services.AddSingleton<IClassificationReportQueries>(sp =>
+            sp.GetRequiredService<ClassificationReportQueries>()
         );
         services.AddSingleton<IEvaluationQueries>(sp =>
-            sp.GetRequiredService<MatchReportQueries>()
+            sp.GetRequiredService<ClassificationReportQueries>()
         );
         services.AddSingleton<IDatasetImporter, Banking77Importer>();
 

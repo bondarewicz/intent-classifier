@@ -1,10 +1,10 @@
 namespace IntentClassifier.Cli;
 
 using IntentClassifier.Application.Abstractions;
+using IntentClassifier.Application.Classification;
 using IntentClassifier.Application.Embeddings;
 using IntentClassifier.Application.Evaluation;
 using IntentClassifier.Application.Intents;
-using IntentClassifier.Application.Matching;
 using IntentClassifier.Application.Queries;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -51,12 +51,12 @@ internal static class Commands
         return 0;
     }
 
-    public static async Task<int> Match(IServiceProvider services, CliOptions options)
+    public static async Task<int> ClassifyAll(IServiceProvider services, CliOptions options)
     {
         var top = options.Top ?? 5;
         var started = DateTime.UtcNow;
         var result = await services
-            .GetRequiredService<RecomputeMatchesHandler>()
+            .GetRequiredService<ClassifyAllHandler>()
             .Handle(top, options.Representation);
 
         Console.WriteLine(
@@ -96,7 +96,7 @@ internal static class Commands
         Console.WriteLine(
             $"Embedding:  {result.EmbeddingSource}, by {options.Representation}{(result.IsAmbiguous ? ", AMBIGUOUS" : "")}"
         );
-        foreach (var m in result.Matches)
+        foreach (var m in result.Candidates)
             Console.WriteLine($"  {m.Rank, 2}. {m.Similarity:F4}  {m.IntentName} ({m.IntentId})");
         return 0;
     }

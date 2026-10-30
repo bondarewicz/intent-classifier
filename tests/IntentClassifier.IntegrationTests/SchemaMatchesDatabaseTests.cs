@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using Dapper;
 using IntentClassifier.Infrastructure.Persistence.ClassifiedQueries;
-using IntentClassifier.Infrastructure.Persistence.IntentMatches;
+using IntentClassifier.Infrastructure.Persistence.IntentCandidates;
 using IntentClassifier.Infrastructure.Persistence.Intents;
 using IntentClassifier.Infrastructure.Persistence.LabelledQueries;
 using IntentClassifier.Infrastructure.Persistence.Reports;
@@ -40,8 +40,8 @@ public sealed class SchemaMatchesDatabaseTests(PostgresFixture db) : IClassFixtu
     {
         yield return [IntentsSchema.Table, typeof(IntentRow)];
         yield return [LabelledQueriesSchema.Table, typeof(LabelledQueryRow)];
-        yield return [QueryIntentMatchesSchema.Table, typeof(QueryIntentMatchRow)];
-        yield return [QueryMatchReportSchema.View, typeof(QueryMatchReportRow)];
+        yield return [QueryIntentCandidatesSchema.Table, typeof(QueryIntentCandidateRow)];
+        yield return [QueryClassificationReportSchema.View, typeof(QueryClassificationReportRow)];
         yield return [ClassifiedQueriesSchema.Table, typeof(ClassifiedQueryRow)];
     }
 

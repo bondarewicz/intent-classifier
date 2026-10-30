@@ -1,10 +1,10 @@
 namespace IntentClassifier.IntegrationTests;
 
 using IntentClassifier.Application.Abstractions;
+using IntentClassifier.Application.Classification;
 using IntentClassifier.Application.Embeddings;
 using IntentClassifier.Application.Evaluation;
 using IntentClassifier.Application.Intents;
-using IntentClassifier.Application.Matching;
 using IntentClassifier.Application.Queries;
 using IntentClassifier.Domain.Intents;
 using IntentClassifier.Domain.Queries;
@@ -46,9 +46,9 @@ public sealed class PipelineTests(PostgresFixture db) : IClassFixture<PostgresFi
         var result = await Get<ClassifyQueryHandler>().Handle("My card has NOT arrived yet", 3);
 
         Assert.Equal(EmbeddingSource.Stored, result.EmbeddingSource);
-        Assert.Equal("card_arrival", result.Matches[0].IntentId.Value);
-        Assert.Equal([1, 2, 3], result.Matches.Select(m => m.Rank));
-        Assert.True(result.Matches[0].Similarity >= result.Matches[1].Similarity);
+        Assert.Equal("card_arrival", result.Candidates[0].IntentId.Value);
+        Assert.Equal([1, 2, 3], result.Candidates.Select(m => m.Rank));
+        Assert.True(result.Candidates[0].Similarity >= result.Candidates[1].Similarity);
     }
 
     [Fact]
@@ -57,18 +57,21 @@ public sealed class PipelineTests(PostgresFixture db) : IClassFixture<PostgresFi
         var result = await Get<ClassifyQueryHandler>().Handle("why is my refund not showing", 3);
 
         Assert.Equal(EmbeddingSource.Generated, result.EmbeddingSource);
-        Assert.Equal("refund_not_showing_up", result.Matches[0].IntentId.Value);
+        Assert.Equal("refund_not_showing_up", result.Candidates[0].IntentId.Value);
     }
 
     [Fact]
-    public async Task Match_stores_top_k_for_every_query_and_summarizes_by_split()
+    public async Task ClassifyAll_stores_top_k_for_every_query_and_summarizes_by_split()
     {
-        var matched = await Get<RecomputeMatchesHandler>().Handle(top: 3);
+        var classified = await Get<ClassifyAllHandler>().Handle(top: 3);
 
-        Assert.Equal(15 * 3, matched.RowsStored);
-        Assert.Equal([DatasetSplit.Train, DatasetSplit.Test], matched.Summary.Select(s => s.Split));
-        Assert.Equal(10, matched.Summary[0].Queries);
-        Assert.Equal(5, matched.Summary[1].Queries);
+        Assert.Equal(15 * 3, classified.RowsStored);
+        Assert.Equal(
+            [DatasetSplit.Train, DatasetSplit.Test],
+            classified.Summary.Select(s => s.Split)
+        );
+        Assert.Equal(10, classified.Summary[0].Queries);
+        Assert.Equal(5, classified.Summary[1].Queries);
     }
 
     [Fact]

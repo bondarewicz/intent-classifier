@@ -7,7 +7,11 @@ public sealed class CliOptionsTests
     [Fact]
     public void Valid_top_option_is_parsed()
     {
-        var parsed = CliOptions.TryParse(["match", "--top", "5"], out var options, out var error);
+        var parsed = CliOptions.TryParse(
+            ["classify-all", "--top", "5"],
+            out var options,
+            out var error
+        );
 
         Assert.True(parsed);
         Assert.Null(error);
@@ -31,7 +35,7 @@ public sealed class CliOptionsTests
     [Fact]
     public void Flag_missing_its_value_is_rejected()
     {
-        var parsed = CliOptions.TryParse(["match", "--top"], out var options, out var error);
+        var parsed = CliOptions.TryParse(["classify-all", "--top"], out var options, out var error);
 
         Assert.False(parsed);
         Assert.Null(options);

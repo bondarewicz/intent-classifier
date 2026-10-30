@@ -53,7 +53,7 @@ try
         "seed" => await Commands.Seed(services, options),
         "embed" => await Commands.Embed(services, options),
         "train" => await Commands.Train(services),
-        "match" => await Commands.Match(services, options),
+        "classify-all" => await Commands.ClassifyAll(services, options),
         "evaluate" => await Commands.Evaluate(services),
         "classify" when options.Positional.Count > 0 => await Commands.Classify(services, options),
         "label" when options.Positional.Count == 2 => await Commands.Label(services, options),

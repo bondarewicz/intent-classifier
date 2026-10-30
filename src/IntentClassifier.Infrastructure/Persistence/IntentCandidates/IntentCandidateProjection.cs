@@ -1,11 +1,12 @@
-namespace IntentClassifier.Infrastructure.Persistence.IntentMatches;
+namespace IntentClassifier.Infrastructure.Persistence.IntentCandidates;
 
 using Dapper;
-using IntentClassifier.Application.Matching;
+using IntentClassifier.Application.Classification;
 using IntentClassifier.Domain.Intents;
 using Npgsql;
 
-internal sealed class IntentMatchProjection(NpgsqlDataSource dataSource) : IIntentMatchProjection
+internal sealed class IntentCandidateProjection(NpgsqlDataSource dataSource)
+    : IIntentCandidateProjection
 {
     // The new results replace the previous run atomically.
     public async Task<long> RebuildAll(
@@ -19,14 +20,14 @@ internal sealed class IntentMatchProjection(NpgsqlDataSource dataSource) : IInte
 
         await conn.ExecuteAsync(
             new CommandDefinition(
-                QueryIntentMatchesSchema.Sql.DeleteAll,
+                QueryIntentCandidatesSchema.Sql.DeleteAll,
                 transaction: tx,
                 cancellationToken: ct
             )
         );
         await conn.ExecuteAsync(
             new CommandDefinition(
-                QueryIntentMatchesSchema.Sql.InsertTopMatches(representation),
+                QueryIntentCandidatesSchema.Sql.InsertTopCandidates(representation),
                 new { Top = top },
                 tx,
                 commandTimeout: 0,
@@ -35,7 +36,7 @@ internal sealed class IntentMatchProjection(NpgsqlDataSource dataSource) : IInte
         );
         var stored = await conn.ExecuteScalarAsync<long>(
             new CommandDefinition(
-                QueryIntentMatchesSchema.Sql.Count,
+                QueryIntentCandidatesSchema.Sql.Count,
                 transaction: tx,
                 cancellationToken: ct
             )

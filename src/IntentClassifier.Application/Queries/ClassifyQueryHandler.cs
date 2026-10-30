@@ -1,9 +1,9 @@
 namespace IntentClassifier.Application.Queries;
 
 using IntentClassifier.Application.Abstractions;
+using IntentClassifier.Domain.Classification;
 using IntentClassifier.Domain.Embeddings;
 using IntentClassifier.Domain.Intents;
-using IntentClassifier.Domain.Matching;
 using IntentClassifier.Domain.Queries;
 
 public enum EmbeddingSource
@@ -17,7 +17,7 @@ public sealed record ClassifyQueryResult(
     QueryText Text,
     EmbeddingSource EmbeddingSource,
     bool IsAmbiguous,
-    IReadOnlyList<IntentMatch> Matches
+    IReadOnlyList<IntentCandidate> Candidates
 );
 
 // Reuses a stored embedding when the text is known, else generates one; ranks intents by cosine
@@ -59,10 +59,10 @@ public sealed class ClassifyQueryHandler(
             source = EmbeddingSource.Generated;
         }
 
-        // Ambiguity needs the runner-up even when only the best match is requested.
-        var matches = await intents.FindClosest(embedding, Math.Max(top, 2), representation, ct);
-        var best = matches.Count > 0 ? matches[0] : null;
-        var ambiguous = MatchConfidence.IsAmbiguous(matches);
+        // Ambiguity needs the runner-up even when only the best candidate is requested.
+        var candidates = await intents.FindClosest(embedding, Math.Max(top, 2), representation, ct);
+        var best = candidates.Count > 0 ? candidates[0] : null;
+        var ambiguous = ClassificationConfidence.IsAmbiguous(candidates);
 
         await log.Record(
             text,
@@ -79,7 +79,7 @@ public sealed class ClassifyQueryHandler(
             text,
             source,
             ambiguous,
-            matches.Take(top).ToList()
+            candidates.Take(top).ToList()
         );
     }
 }

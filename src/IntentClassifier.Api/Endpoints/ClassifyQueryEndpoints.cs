@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 
 public static class ClassifyQueryEndpoints
 {
-    private const int TopMatches = 3;
+    private const int TopCandidates = 3;
 
     public static IEndpointRouteBuilder MapClassifyQueryEndpoints(this IEndpointRouteBuilder app)
     {
@@ -26,7 +26,7 @@ public static class ClassifyQueryEndpoints
         CancellationToken ct
     )
     {
-        var result = await handler.Handle(request.Query ?? string.Empty, TopMatches, ct: ct);
+        var result = await handler.Handle(request.Query ?? string.Empty, TopCandidates, ct: ct);
         return TypedResults.Ok(ClassifyQueryResponse.From(result));
     }
 }
