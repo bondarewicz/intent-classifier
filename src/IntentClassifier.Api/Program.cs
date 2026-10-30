@@ -21,6 +21,7 @@ builder
 builder.Services.AddOpenApi();
 builder.Services.AddExceptionHandler<ClassifyQueryExceptionHandler>();
 builder.Services.AddProblemDetails();
+builder.Services.AddValidation();
 builder.Services.AddApplication().AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
