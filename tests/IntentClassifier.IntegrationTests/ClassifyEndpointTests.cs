@@ -34,6 +34,34 @@ public sealed class ClassifyEndpointTests(PostgresFixture db) : IClassFixture<Po
     }
 
     [Fact]
+    public async Task Top_sets_how_many_candidates_come_back()
+    {
+        using var api = CreateApi(swapGenerator: true);
+
+        var response = await api.Client.PostAsJsonAsync(
+            Endpoint,
+            new ClassifyQueryRequest("My card has NOT arrived yet", Top: 1)
+        );
+
+        var body = await response.Content.ReadFromJsonAsync<ClassifyQueryResponse>();
+        Assert.Single(body!.Candidates);
+    }
+
+    [Fact]
+    public async Task Top_below_one_is_a_validation_problem()
+    {
+        using var api = CreateApi(swapGenerator: true);
+
+        var response = await api.Client.PostAsJsonAsync(
+            Endpoint,
+            new ClassifyQueryRequest("My card has NOT arrived yet", Top: 0)
+        );
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
+    }
+
+    [Fact]
     public async Task Classify_returns_a_validation_problem_for_an_empty_query()
     {
         using var api = CreateApi(swapGenerator: true);

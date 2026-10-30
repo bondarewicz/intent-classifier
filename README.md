@@ -136,7 +136,8 @@ curl -s -X POST http://localhost:5235/queries/classify \
 }
 ```
 
-Errors are `ProblemDetails` from one `IExceptionHandler`: empty query → 400, new query with no OpenAI key → 503.
+An optional `"top"` (default 3) sets how many candidates come back.
+Errors are `ProblemDetails` from one `IExceptionHandler`: empty query or `top` below 1 → 400, new query with no OpenAI key → 503.
 OpenAPI at `/openapi/v1.json` (Development); samples in `src/IntentClassifier.Api/IntentClassifier.Api.http`.
 `Database:AutoMigrate=true` applies migrations on startup.
 

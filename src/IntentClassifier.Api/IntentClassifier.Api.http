@@ -27,13 +27,19 @@ Content-Type: application/json
 
 { "query": "  HOW DO I   locate MY card?  " }
 
-### Request shape: "query" is the only field the endpoint reads. There is
-### no top/representation parameter over HTTP - those are CLI-only knobs;
-### the endpoint always asks for the top 3 candidates by centroid (no OpenAI call)
+### Request shape: "query" plus an optional "top" (default 3) for how many
+### candidates come back. Representation is a CLI-only knob; the endpoint
+### always classifies by centroid (no OpenAI call)
 POST {{host}}/queries/classify
 Content-Type: application/json
 
-{ "query": "where is the virtual card?" }
+{ "query": "where is the virtual card?", "top": 5 }
+
+### 400: top below 1 (no OpenAI call)
+POST {{host}}/queries/classify
+Content-Type: application/json
+
+{ "query": "where is the virtual card?", "top": 0 }
 
 ### New query: not in the dataset, embedded on the fly (calls OpenAI).
 ### Sending this exact request again reports "stored" with no OpenAI

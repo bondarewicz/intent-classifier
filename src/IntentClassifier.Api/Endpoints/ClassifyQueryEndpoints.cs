@@ -5,25 +5,32 @@ using Microsoft.AspNetCore.Http.HttpResults;
 
 public static class ClassifyQueryEndpoints
 {
-    private const int TopCandidates = 3;
+    private const int DefaultTop = 3;
     private const string Endpoint = "/queries/classify";
 
     public static void MapClassifyQueryEndpoints(this IEndpointRouteBuilder app) =>
         app.MapPost(Endpoint, Classify)
             .WithName("ClassifyQuery")
             .WithSummary(
-                "Top 3 Banking77 intents for a raw customer query, by cosine similarity to the intent centroids."
+                "Closest Banking77 intents for a raw customer query, by cosine similarity to the intent centroids; top (default 3) sets how many."
             );
 
     // InvalidQueryException -> 400 and EmbeddingUnavailableException -> 503 are mapped by
-    // ClassifyQueryExceptionHandler, so this is the happy path only.
-    private static async Task<Ok<ClassifyQueryResponse>> Classify(
+    // ClassifyQueryExceptionHandler; only top is validated here because the handler would
+    // throw ArgumentOutOfRangeException for it, which is a 500.
+    private static async Task<Results<Ok<ClassifyQueryResponse>, ValidationProblem>> Classify(
         ClassifyQueryRequest request,
         ClassifyQueryHandler handler,
         CancellationToken ct
     )
     {
-        var result = await handler.Handle(request.Query ?? string.Empty, TopCandidates, ct: ct);
+        var top = request.Top ?? DefaultTop;
+        if (top < 1)
+            return TypedResults.ValidationProblem(
+                new Dictionary<string, string[]> { ["top"] = ["top must be at least 1."] }
+            );
+
+        var result = await handler.Handle(request.Query ?? string.Empty, top, ct: ct);
         return TypedResults.Ok(ClassifyQueryResponse.From(result));
     }
 }
