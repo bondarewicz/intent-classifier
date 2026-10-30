@@ -17,10 +17,8 @@ public sealed class ClassifiedQueryLogTests(PostgresFixture db) : IClassFixture<
     [Fact]
     public async Task Generated_query_is_logged_and_reused_without_a_second_generator_call()
     {
-        var first = await Get<ClassifyQueryHandler>()
-            .Handle("i lost my card while traveling abroad", 3);
-        var second = await Get<ClassifyQueryHandler>()
-            .Handle("i lost my card while traveling abroad", 3);
+        var first = await Classify("i lost my card while traveling abroad");
+        var second = await Classify("i lost my card while traveling abroad");
 
         Assert.Equal(EmbeddingSource.Generated, first.EmbeddingSource);
         Assert.Equal(EmbeddingSource.Stored, second.EmbeddingSource);
@@ -31,9 +29,9 @@ public sealed class ClassifiedQueryLogTests(PostgresFixture db) : IClassFixture<
     {
         const string query = "where is my replacement card please";
 
-        await Get<ClassifyQueryHandler>().Handle(query, 3);
-        await Get<ClassifyQueryHandler>().Handle(query, 3);
-        await Get<ClassifyQueryHandler>().Handle(query, 3);
+        await Classify(query);
+        await Classify(query);
+        await Classify(query);
 
         Assert.Equal(3, await TimesClassified(query));
     }
@@ -60,10 +58,10 @@ public sealed class ClassifiedQueryLogTests(PostgresFixture db) : IClassFixture<
         const string query = "the embedding should not drift on repeat classify";
         var log = Get<IClassifiedQueryLog>();
 
-        await Get<ClassifyQueryHandler>().Handle(query, 3);
+        await Classify(query);
         var afterFirst = await log.FindEmbedding(QueryText.Create(query));
 
-        await Get<ClassifyQueryHandler>().Handle(query, 3);
+        await Classify(query);
         var afterSecond = await log.FindEmbedding(QueryText.Create(query));
 
         Assert.Equal(afterFirst!.Values.ToArray(), afterSecond!.Values.ToArray());
@@ -73,7 +71,7 @@ public sealed class ClassifiedQueryLogTests(PostgresFixture db) : IClassFixture<
     public async Task Label_rejects_a_query_that_was_never_classified()
     {
         await Assert.ThrowsAsync<InvalidQueryException>(() =>
-            Get<ConfirmLabelHandler>().Handle("never sent to classify", "card_arrival")
+            Label("never sent to classify", "card_arrival")
         );
     }
 
@@ -81,11 +79,9 @@ public sealed class ClassifiedQueryLogTests(PostgresFixture db) : IClassFixture<
     public async Task Label_rejects_an_intent_that_does_not_exist()
     {
         const string query = "a query for a bad intent test";
-        await Get<ClassifyQueryHandler>().Handle(query, 3);
+        await Classify(query);
 
-        await Assert.ThrowsAsync<InvalidQueryException>(() =>
-            Get<ConfirmLabelHandler>().Handle(query, "not_a_real_intent")
-        );
+        await Assert.ThrowsAsync<InvalidQueryException>(() => Label(query, "not_a_real_intent"));
     }
 
     [Fact]
@@ -93,11 +89,9 @@ public sealed class ClassifiedQueryLogTests(PostgresFixture db) : IClassFixture<
     {
         // Seeded in both splits (Banking77TestData's deliberate train/test overlap).
         const string query = "My card has not arrived yet";
-        await Get<ClassifyQueryHandler>().Handle(query, 3);
+        await Classify(query);
 
-        await Assert.ThrowsAsync<InvalidQueryException>(() =>
-            Get<ConfirmLabelHandler>().Handle(query, "card_arrival")
-        );
+        await Assert.ThrowsAsync<InvalidQueryException>(() => Label(query, "card_arrival"));
     }
 
     [Fact]
@@ -105,10 +99,10 @@ public sealed class ClassifiedQueryLogTests(PostgresFixture db) : IClassFixture<
     {
         // Train-only (not in the test split).
         const string query = "I was charged twice for one payment";
-        await Get<ClassifyQueryHandler>().Handle(query, 3);
+        await Classify(query);
 
         await Assert.ThrowsAsync<InvalidQueryException>(() =>
-            Get<ConfirmLabelHandler>().Handle(query, "transaction_charged_twice")
+            Label(query, "transaction_charged_twice")
         );
     }
 
@@ -118,8 +112,8 @@ public sealed class ClassifiedQueryLogTests(PostgresFixture db) : IClassFixture<
         const string query = "my new card never showed up";
         var before = await TrainCount();
 
-        await Get<ClassifyQueryHandler>().Handle(query, 3);
-        var result = await Get<ConfirmLabelHandler>().Handle(query, "card_arrival");
+        await Classify(query);
+        var result = await Label(query, "card_arrival");
 
         Assert.Equal("card_arrival", result.IntentId.Value);
         Assert.Equal(before + 1, await TrainCount());
@@ -132,10 +126,9 @@ public sealed class ClassifiedQueryLogTests(PostgresFixture db) : IClassFixture<
     public async Task Label_accepts_the_query_and_intent_in_any_casing_and_spacing()
     {
         const string query = "my replacement card still has not shown up";
-        await Get<ClassifyQueryHandler>().Handle(query, 3);
+        await Classify(query);
 
-        await Get<ConfirmLabelHandler>()
-            .Handle("  My REPLACEMENT card still has not   shown up ", "Card_Arrival");
+        await Label("  My REPLACEMENT card still has not   shown up ", "Card_Arrival");
 
         Assert.Equal("card_arrival", await TrainIntentId(query));
     }
@@ -146,21 +139,28 @@ public sealed class ClassifiedQueryLogTests(PostgresFixture db) : IClassFixture<
         const string query = "another brand new card question for relabelling";
         var before = await TrainCount();
 
-        await Get<ClassifyQueryHandler>().Handle(query, 3);
-        await Get<ConfirmLabelHandler>().Handle(query, "card_arrival");
+        await Classify(query);
+        await Label(query, "card_arrival");
         Assert.Equal("card_arrival", await TrainIntentId(query));
 
-        await Get<ConfirmLabelHandler>().Handle(query, "transaction_charged_twice");
+        await Label(query, "transaction_charged_twice");
         Assert.Equal("transaction_charged_twice", await TrainIntentId(query));
         Assert.Equal(before + 1, await TrainCount()); // updated in place, not a second row
 
-        await Get<ConfirmLabelHandler>().Handle(query, "transaction_charged_twice");
+        await Label(query, "transaction_charged_twice");
         Assert.Equal("transaction_charged_twice", await TrainIntentId(query));
         Assert.Equal(before + 1, await TrainCount());
     }
 
     private T Get<T>()
         where T : notnull => db.Services!.GetRequiredService<T>();
+
+    // These tests never look at the candidates, so top is fixed to the API's 3.
+    private Task<ClassifyQueryResult> Classify(string query) =>
+        Get<ClassifyQueryHandler>().Handle(query, top: 3);
+
+    private Task<ConfirmLabelResult> Label(string query, string intentId) =>
+        Get<ConfirmLabelHandler>().Handle(query, intentId);
 
     private async Task<T> Query<T>(string sql, object? param = null)
     {
