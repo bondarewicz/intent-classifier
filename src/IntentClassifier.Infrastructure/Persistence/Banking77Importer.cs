@@ -1,11 +1,9 @@
-namespace IntentClassifier.Infrastructure.Persistence.Import;
+namespace IntentClassifier.Infrastructure.Persistence;
 
 using Application.Abstractions;
 using Dapper;
 using Domain.Intents;
 using Domain.Queries;
-using Intents;
-using LabelledQueries;
 using Npgsql;
 
 // Streams the CSVs into a temp stage with COPY FROM STDIN (client side, nothing mounted into the
@@ -13,6 +11,8 @@ using Npgsql;
 // Re-runnable: existing intents and queries (and their embeddings) are kept.
 internal sealed class Banking77Importer(NpgsqlDataSource dataSource) : IDatasetImporter
 {
+    private const string Stage = "banking77_stage";
+
     public async Task<DatasetImportResult> ImportBanking77(
         string trainCsvPath,
         string testCsvPath,
@@ -47,7 +47,7 @@ internal sealed class Banking77Importer(NpgsqlDataSource dataSource) : IDatasetI
 
         await conn.ExecuteAsync(
             new CommandDefinition(
-                Banking77ImportSchema.Sql.AnalyzeImported,
+                $"ANALYZE {Schema.Intents}; ANALYZE {Schema.LabelledQueries};",
                 transaction: tx,
                 cancellationToken: ct
             )
@@ -61,7 +61,7 @@ internal sealed class Banking77Importer(NpgsqlDataSource dataSource) : IDatasetI
         );
     }
 
-    private static async Task<List<Banking77ImportSchema.StagedRow>> StageCsvs(
+    private static async Task<List<StagedRow>> StageCsvs(
         NpgsqlConnection conn,
         NpgsqlTransaction tx,
         string trainCsvPath,
@@ -71,7 +71,7 @@ internal sealed class Banking77Importer(NpgsqlDataSource dataSource) : IDatasetI
     {
         await conn.ExecuteAsync(
             new CommandDefinition(
-                Banking77ImportSchema.Sql.CreateStage,
+                $"CREATE TEMP TABLE {Stage} (query_text text, category text, split text) ON COMMIT DROP",
                 transaction: tx,
                 cancellationToken: ct
             )
@@ -80,9 +80,9 @@ internal sealed class Banking77Importer(NpgsqlDataSource dataSource) : IDatasetI
         await CopyIntoStage(conn, tx, testCsvPath, DatasetSplit.Test, ct);
 
         return (
-            await conn.QueryAsync<Banking77ImportSchema.StagedRow>(
+            await conn.QueryAsync<StagedRow>(
                 new CommandDefinition(
-                    Banking77ImportSchema.Sql.SelectStaged,
+                    $"SELECT query_text, category, split FROM {Stage}",
                     transaction: tx,
                     cancellationToken: ct
                 )
@@ -100,7 +100,7 @@ internal sealed class Banking77Importer(NpgsqlDataSource dataSource) : IDatasetI
     {
         await using (
             var writer = await conn.BeginTextImportAsync(
-                Banking77ImportSchema.Sql.CopyIntoStage,
+                $"COPY {Stage} (query_text, category) FROM STDIN (FORMAT csv, HEADER true)",
                 ct
             )
         )
@@ -112,9 +112,10 @@ internal sealed class Banking77Importer(NpgsqlDataSource dataSource) : IDatasetI
                 await writer.WriteAsync(buffer.AsMemory(0, read), ct);
         }
 
+        // Tags the rows just COPYed, before the next file lands in the same stage.
         await conn.ExecuteAsync(
             new CommandDefinition(
-                Banking77ImportSchema.Sql.MarkSplit,
+                $"UPDATE {Stage} SET split = @Split WHERE split IS NULL",
                 new { Split = split.ToDb() },
                 tx,
                 cancellationToken: ct
@@ -132,7 +133,11 @@ internal sealed class Banking77Importer(NpgsqlDataSource dataSource) : IDatasetI
     {
         await conn.ExecuteAsync(
             new CommandDefinition(
-                IntentsSchema.Sql.InsertMissing,
+                $"""
+                INSERT INTO {Schema.Intents} (intent_id, intent_name)
+                SELECT * FROM unnest(@IntentIds, @IntentNames)
+                ON CONFLICT (intent_id) DO NOTHING
+                """,
                 new
                 {
                     IntentIds = intents.Select(i => i.Value).ToArray(),
@@ -145,7 +150,11 @@ internal sealed class Banking77Importer(NpgsqlDataSource dataSource) : IDatasetI
 
         await conn.ExecuteAsync(
             new CommandDefinition(
-                LabelledQueriesSchema.Sql.InsertMissing,
+                $"""
+                INSERT INTO {Schema.LabelledQueries} (split, query_text, intent_id)
+                SELECT * FROM unnest(@Splits, @QueryTexts, @IntentIds)
+                ON CONFLICT (split, query_text) DO NOTHING
+                """,
                 new
                 {
                     Splits = queries.Select(q => q.Split).ToArray(),
@@ -166,10 +175,17 @@ internal sealed class Banking77Importer(NpgsqlDataSource dataSource) : IDatasetI
         (
             await conn.QueryAsync<(string Split, long Count)>(
                 new CommandDefinition(
-                    LabelledQueriesSchema.Sql.CountBySplit,
+                    $"SELECT split, count(*) FROM {Schema.LabelledQueries} GROUP BY split",
                     transaction: tx,
                     cancellationToken: ct
                 )
             )
         ).ToDictionary(c => c.Split, c => c.Count);
+
+    private sealed class StagedRow
+    {
+        public string QueryText { get; set; } = "";
+        public string Category { get; set; } = "";
+        public string Split { get; set; } = "";
+    }
 }

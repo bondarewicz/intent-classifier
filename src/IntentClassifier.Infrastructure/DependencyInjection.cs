@@ -12,12 +12,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Npgsql;
 using Persistence;
-using Persistence.ClassifiedQueries;
-using Persistence.Import;
-using Persistence.IntentCandidates;
-using Persistence.Intents;
-using Persistence.LabelledQueries;
-using Persistence.Reports;
 
 public static class DependencyInjection
 {
