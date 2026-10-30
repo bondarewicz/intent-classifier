@@ -11,13 +11,13 @@ public sealed class QueryTextTests
         "i was charged twice for the same coffee"
     )]
     [InlineData("Where's my £ refund?!", "where's my £ refund?!")]
-    public void Create_trims_collapses_whitespace_lowercases_and_keeps_punctuation(
+    public void Query_text_is_trimmed_lowercased_and_whitespace_collapsed_but_keeps_punctuation(
         string raw,
         string expected
     ) => Assert.Equal(expected, QueryText.Create(raw).Value);
 
     [Fact]
-    public void Create_is_idempotent()
+    public void Normalizing_an_already_normalized_query_changes_nothing()
     {
         var once = QueryText.Create("  Why is my TOP-UP pending? ");
         Assert.Equal(once, QueryText.Create(once.Value));
@@ -27,11 +27,11 @@ public sealed class QueryTextTests
     [InlineData(null)]
     [InlineData("")]
     [InlineData(" \t\n ")]
-    public void Create_rejects_empty_queries(string? raw) =>
+    public void Empty_query_is_rejected(string? raw) =>
         Assert.Throws<InvalidQueryException>(() => QueryText.Create(raw));
 
     [Fact]
-    public void Create_rejects_queries_over_the_maximum_length() =>
+    public void Query_over_the_maximum_length_is_rejected() =>
         Assert.Throws<InvalidQueryException>(() =>
             QueryText.Create(new string('a', QueryText.MaxLength + 1))
         );

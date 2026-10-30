@@ -41,7 +41,7 @@ public sealed class PipelineTests(PostgresFixture db) : IClassFixture<PostgresFi
         Assert.Equal(4, await Get<TrainIntentsHandler>().Handle());
 
     [Fact]
-    public async Task Known_query_reuses_its_stored_embedding_and_classifies_correctly()
+    public async Task Known_query_reuses_its_stored_embedding_and_is_classified_as_its_labelled_intent()
     {
         var result = await Get<ClassifyQueryHandler>().Handle("My card has NOT arrived yet", 3);
 
@@ -52,7 +52,7 @@ public sealed class PipelineTests(PostgresFixture db) : IClassFixture<PostgresFi
     }
 
     [Fact]
-    public async Task New_query_is_embedded_and_classified_correctly()
+    public async Task New_query_is_embedded_and_classified_as_the_intent_it_describes()
     {
         var result = await Get<ClassifyQueryHandler>().Handle("why is my refund not showing", 3);
 
@@ -61,7 +61,7 @@ public sealed class PipelineTests(PostgresFixture db) : IClassFixture<PostgresFi
     }
 
     [Fact]
-    public async Task ClassifyAll_stores_top_k_for_every_query_and_summarizes_by_split()
+    public async Task Classifying_the_whole_dataset_stores_top_k_per_query_and_summarizes_by_split()
     {
         var classified = await Get<ClassifyAllHandler>().Handle(top: 3);
 

@@ -9,7 +9,7 @@ public sealed class IntentIdTests
     [InlineData("Refund_not_showing_up", "refund_not_showing_up")] // spelled like this in Banking77
     [InlineData("reverted_card_payment?", "reverted_card_payment")] // spelled like this in Banking77
     [InlineData(" top_up_failed ", "top_up_failed")]
-    public void Create_canonicalizes_labels(string label, string expected) =>
+    public void Intent_labels_are_canonicalized_to_lowercase_ids(string label, string expected) =>
         Assert.Equal(expected, IntentId.Create(label).Value);
 
     [Theory]
@@ -18,7 +18,7 @@ public sealed class IntentIdTests
     [InlineData("???")]
     [InlineData("_leading")]
     [InlineData("double__underscore")]
-    public void Create_rejects_labels_that_are_not_ids(string? label) =>
+    public void Malformed_intent_label_is_rejected(string? label) =>
         Assert.Throws<ArgumentException>(() => IntentId.Create(label));
 
     [Fact]

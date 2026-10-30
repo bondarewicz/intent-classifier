@@ -157,6 +157,18 @@ public sealed class ClassifiedQueryLogTests(PostgresFixture db) : IClassFixture<
     }
 
     [Fact]
+    public async Task Label_accepts_the_query_and_intent_in_any_casing_and_spacing()
+    {
+        const string query = "my replacement card still has not shown up";
+        await Get<ClassifyQueryHandler>().Handle(query, 3);
+
+        await Get<ConfirmLabelHandler>()
+            .Handle("  My REPLACEMENT card still has not   shown up ", "Card_Arrival");
+
+        Assert.Equal("card_arrival", await TrainIntentId(query));
+    }
+
+    [Fact]
     public async Task Relabelling_updates_the_promoted_row_and_is_idempotent_for_the_same_intent()
     {
         const string query = "another brand new card question for relabelling";

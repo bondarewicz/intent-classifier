@@ -94,7 +94,6 @@ internal sealed class InMemoryClassifiedQueryLog : IClassifiedQueryLog
     private readonly Dictionary<string, LoggedQuery> rows = [];
 
     public List<Recorded> RecordedCalls { get; } = [];
-    public int ConfirmCalls { get; private set; }
 
     public void Seed(QueryText text, Embedding embedding, IntentId? confirmedIntentId = null) =>
         rows[text.Value] = new LoggedQuery(embedding, confirmedIntentId);
@@ -131,7 +130,6 @@ internal sealed class InMemoryClassifiedQueryLog : IClassifiedQueryLog
                 $"'{text}' has not been classified yet - run classify first."
             );
         rows[text.Value] = new LoggedQuery(existing.Embedding, intentId);
-        ConfirmCalls++;
         return Task.CompletedTask;
     }
 }
