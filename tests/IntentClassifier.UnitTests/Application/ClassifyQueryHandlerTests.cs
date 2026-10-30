@@ -17,17 +17,24 @@ public sealed class ClassifyQueryHandlerTests
             embedding
         );
 
+    // Every collaborator defaults to an empty fake; a test passes only the ones it inspects.
+    private static ClassifyQueryHandler Handler(
+        InMemoryLabelledQueryRepository? queries = null,
+        InMemoryClassifiedQueryLog? log = null,
+        FakeIntentRepository? intents = null,
+        FakeEmbeddingGenerator? generator = null
+    ) => new(queries ?? new(), log ?? new(), intents ?? new(), generator ?? new());
+
     [Fact]
     public async Task Known_query_reuses_the_stored_embedding_without_generating_one()
     {
         var stored = new Embedding([0.1f, 0.2f]);
         var intents = new FakeIntentRepository();
         var generator = new FakeEmbeddingGenerator();
-        var handler = new ClassifyQueryHandler(
-            new InMemoryLabelledQueryRepository(Known("how do i locate my card?", stored)),
-            new InMemoryClassifiedQueryLog(),
-            intents,
-            generator
+        var handler = Handler(
+            queries: new(Known("how do i locate my card?", stored)),
+            intents: intents,
+            generator: generator
         );
 
         var result = await handler.Handle("  How do I locate my CARD? ", 3);
@@ -46,12 +53,7 @@ public sealed class ClassifyQueryHandlerTests
         log.Seed(QueryText.Create("where is my refund"), logged);
         var intents = new FakeIntentRepository();
         var generator = new FakeEmbeddingGenerator();
-        var handler = new ClassifyQueryHandler(
-            new InMemoryLabelledQueryRepository(),
-            log,
-            intents,
-            generator
-        );
+        var handler = Handler(log: log, intents: intents, generator: generator);
 
         var result = await handler.Handle("where is my refund", 3);
 
@@ -68,11 +70,10 @@ public sealed class ClassifyQueryHandlerTests
         var log = new InMemoryClassifiedQueryLog();
         log.Seed(QueryText.Create("same text"), logged);
         var intents = new FakeIntentRepository();
-        var handler = new ClassifyQueryHandler(
-            new InMemoryLabelledQueryRepository(Known("same text", labelled)),
-            log,
-            intents,
-            new FakeEmbeddingGenerator()
+        var handler = Handler(
+            queries: new(Known("same text", labelled)),
+            log: log,
+            intents: intents
         );
 
         await handler.Handle("same text", 3);
@@ -83,14 +84,8 @@ public sealed class ClassifyQueryHandlerTests
     [Fact]
     public async Task Unknown_query_is_embedded_from_its_normalized_text()
     {
-        var intents = new FakeIntentRepository();
         var generator = new FakeEmbeddingGenerator();
-        var handler = new ClassifyQueryHandler(
-            new InMemoryLabelledQueryRepository(),
-            new InMemoryClassifiedQueryLog(),
-            intents,
-            generator
-        );
+        var handler = Handler(generator: generator);
 
         var result = await handler.Handle("Charged TWICE for coffee", 3);
 
@@ -102,15 +97,8 @@ public sealed class ClassifyQueryHandlerTests
     [Fact]
     public async Task Repeat_classification_of_a_generated_query_reuses_the_log_and_skips_the_generator()
     {
-        var intents = new FakeIntentRepository();
         var generator = new FakeEmbeddingGenerator();
-        var log = new InMemoryClassifiedQueryLog();
-        var handler = new ClassifyQueryHandler(
-            new InMemoryLabelledQueryRepository(),
-            log,
-            intents,
-            generator
-        );
+        var handler = Handler(generator: generator);
 
         var first = await handler.Handle("a brand new question", 3);
         var second = await handler.Handle("a brand new question", 3);
@@ -124,12 +112,7 @@ public sealed class ClassifyQueryHandlerTests
     public async Task Every_successful_classification_is_recorded_to_the_log()
     {
         var log = new InMemoryClassifiedQueryLog();
-        var handler = new ClassifyQueryHandler(
-            new InMemoryLabelledQueryRepository(),
-            log,
-            new FakeIntentRepository(),
-            new FakeEmbeddingGenerator()
-        );
+        var handler = Handler(log: log);
 
         await handler.Handle("hello", 3);
 
@@ -141,13 +124,9 @@ public sealed class ClassifyQueryHandlerTests
     public async Task Reusing_a_labelled_embedding_is_still_recorded_to_the_log()
     {
         var log = new InMemoryClassifiedQueryLog();
-        var handler = new ClassifyQueryHandler(
-            new InMemoryLabelledQueryRepository(
-                Known("how do i locate my card?", new Embedding([0.1f, 0.2f]))
-            ),
-            log,
-            new FakeIntentRepository(),
-            new FakeEmbeddingGenerator()
+        var handler = Handler(
+            queries: new(Known("how do i locate my card?", new Embedding([0.1f, 0.2f]))),
+            log: log
         );
 
         var result = await handler.Handle("how do i locate my card?", 3);
@@ -187,12 +166,7 @@ public sealed class ClassifyQueryHandlerTests
     public async Task Uses_centroids_unless_asked_otherwise()
     {
         var intents = new FakeIntentRepository();
-        var handler = new ClassifyQueryHandler(
-            new InMemoryLabelledQueryRepository(),
-            new InMemoryClassifiedQueryLog(),
-            intents,
-            new FakeEmbeddingGenerator()
-        );
+        var handler = Handler(intents: intents);
 
         await handler.Handle("hello", 3);
         Assert.Equal(IntentRepresentation.Centroid, intents.LastRepresentation);
@@ -205,12 +179,7 @@ public sealed class ClassifyQueryHandlerTests
     public async Task Flags_ambiguity_even_when_only_the_best_candidate_is_requested()
     {
         var intents = new FakeIntentRepository { Similarities = [0.80, 0.79, 0.5] };
-        var handler = new ClassifyQueryHandler(
-            new InMemoryLabelledQueryRepository(),
-            new InMemoryClassifiedQueryLog(),
-            intents,
-            new FakeEmbeddingGenerator()
-        );
+        var handler = Handler(intents: intents);
 
         var result = await handler.Handle("refund", top: 1);
 
@@ -223,12 +192,7 @@ public sealed class ClassifyQueryHandlerTests
     public async Task Zero_candidates_are_recorded_with_no_best_and_not_ambiguous()
     {
         var log = new InMemoryClassifiedQueryLog();
-        var handler = new ClassifyQueryHandler(
-            new InMemoryLabelledQueryRepository(),
-            log,
-            new FakeIntentRepository { Similarities = [] },
-            new FakeEmbeddingGenerator()
-        );
+        var handler = Handler(log: log, intents: new FakeIntentRepository { Similarities = [] });
 
         var result = await handler.Handle("refund", top: 3);
 
@@ -245,12 +209,7 @@ public sealed class ClassifyQueryHandlerTests
     {
         var generator = new FakeEmbeddingGenerator();
         var log = new InMemoryClassifiedQueryLog();
-        var handler = new ClassifyQueryHandler(
-            new InMemoryLabelledQueryRepository(),
-            log,
-            new FakeIntentRepository(),
-            generator
-        );
+        var handler = Handler(log: log, generator: generator);
 
         await Assert.ThrowsAsync<InvalidQueryException>(() => handler.Handle("   ", 3));
         Assert.Empty(generator.Requested);
@@ -260,12 +219,7 @@ public sealed class ClassifyQueryHandlerTests
     [Fact]
     public async Task Unknown_query_without_generator_surfaces_unavailable()
     {
-        var handler = new ClassifyQueryHandler(
-            new InMemoryLabelledQueryRepository(),
-            new InMemoryClassifiedQueryLog(),
-            new FakeIntentRepository(),
-            new FakeEmbeddingGenerator(available: false)
-        );
+        var handler = Handler(generator: new FakeEmbeddingGenerator(available: false));
 
         await Assert.ThrowsAsync<EmbeddingUnavailableException>(() =>
             handler.Handle("brand new question", 3)
