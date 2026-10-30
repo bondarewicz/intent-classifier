@@ -38,85 +38,106 @@ internal sealed record CliOptions(
         }
 
         var positional = new List<string>();
-        int? top = null;
-        var batchSize = 1000;
-        var representation = IntentRepresentation.Centroid;
-        var trainPath = Path.Combine("data", "banking77", "train.csv");
-        var testPath = Path.Combine("data", "banking77", "test.csv");
+        var parsed = new CliOptions(
+            Command: args[0],
+            Positional: positional,
+            Top: null,
+            BatchSize: 1000,
+            Representation: IntentRepresentation.Centroid,
+            TrainPath: Path.Combine("data", "banking77", "train.csv"),
+            TestPath: Path.Combine("data", "banking77", "test.csv")
+        );
 
         for (var i = 1; i < args.Length; i++)
         {
-            switch (args[i])
-            {
-                case "--top":
-                    if (
-                        !TryTakeValue(args, ref i, out var topText)
-                        || !int.TryParse(topText, out var parsedTop)
-                    )
-                    {
-                        error = "--top requires an integer value.";
-                        return false;
-                    }
-                    top = parsedTop;
-                    break;
-                case "--batch":
-                    if (
-                        !TryTakeValue(args, ref i, out var batchText)
-                        || !int.TryParse(batchText, out batchSize)
-                    )
-                    {
-                        error = "--batch requires an integer value.";
-                        return false;
-                    }
-                    break;
-                case "--by":
-                    if (
-                        !TryTakeValue(args, ref i, out var byText)
-                        || !Enum.TryParse(byText, ignoreCase: true, out representation)
-                        || !Enum.IsDefined(representation)
-                    )
-                    {
-                        error = "--by must be 'centroid' or 'name'.";
-                        return false;
-                    }
-                    break;
-                case "--train":
-                    if (!TryTakeValue(args, ref i, out trainPath))
-                    {
-                        error = "--train requires a path.";
-                        return false;
-                    }
-                    break;
-                case "--test":
-                    if (!TryTakeValue(args, ref i, out testPath))
-                    {
-                        error = "--test requires a path.";
-                        return false;
-                    }
-                    break;
-                default:
-                    if (args[i].StartsWith("--", StringComparison.Ordinal))
-                    {
-                        error = $"Unknown option: {args[i]}";
-                        return false;
-                    }
-                    positional.Add(args[i]);
-                    break;
-            }
+            if (!TryApplyOption(args, ref i, ref parsed, positional, out error))
+                return false;
         }
 
         error = null;
-        options = new CliOptions(
-            args[0],
-            positional,
-            top,
-            batchSize,
-            representation,
-            trainPath,
-            testPath
-        );
+        options = parsed;
         return true;
     }
+
+    private sealed record Flag(string Error, Func<string, CliOptions, CliOptions?> Apply);
+
+    // Every flag takes the next argument as its value; Apply returns null when that value is invalid.
+    private static readonly Dictionary<string, Flag> Flags = new()
+    {
+        ["--top"] = new(
+            "--top requires an integer value.",
+            (value, o) => int.TryParse(value, out var top) ? o with { Top = top } : null
+        ),
+        ["--batch"] = new(
+            "--batch requires an integer value.",
+            (value, o) => int.TryParse(value, out var batch) ? o with { BatchSize = batch } : null
+        ),
+        ["--by"] = new(
+            "--by must be 'centroid' or 'name'.",
+            (value, o) =>
+                TryParseRepresentation(value, out var representation)
+                    ? o with
+                    {
+                        Representation = representation,
+                    }
+                    : null
+        ),
+        ["--train"] = new("--train requires a path.", (value, o) => o with { TrainPath = value }),
+        ["--test"] = new("--test requires a path.", (value, o) => o with { TestPath = value }),
+    };
+
+    // Applies args[i] to options, advancing i past a flag's value.
+    private static bool TryApplyOption(
+        string[] args,
+        ref int i,
+        ref CliOptions options,
+        List<string> positional,
+        out string? error
+    )
+    {
+        var arg = args[i];
+        if (Flags.TryGetValue(arg, out var flag))
+            return TryApplyFlag(flag, args, ref i, ref options, out error);
+
+        if (arg.StartsWith("--", StringComparison.Ordinal))
+        {
+            error = $"Unknown option: {arg}";
+            return false;
+        }
+
+        positional.Add(arg);
+        error = null;
+        return true;
+    }
+
+    private static bool TryApplyFlag(
+        Flag flag,
+        string[] args,
+        ref int i,
+        ref CliOptions options,
+        out string? error
+    )
+    {
+        if (
+            !TryTakeValue(args, ref i, out var value)
+            || flag.Apply(value, options) is not { } applied
+        )
+        {
+            error = flag.Error;
+            return false;
+        }
+
+        options = applied;
+        error = null;
+        return true;
+    }
+
+    private static bool TryParseRepresentation(
+        string value,
+        out IntentRepresentation representation
+    ) =>
+        Enum.TryParse(value, ignoreCase: true, out representation)
+        && Enum.IsDefined(representation);
 
     private static bool TryTakeValue(string[] args, ref int i, out string value)
     {
