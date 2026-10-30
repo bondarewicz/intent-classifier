@@ -8,23 +8,6 @@ using IntentClassifier.Domain.Queries;
 
 public sealed class ClassifyQueryHandlerTests
 {
-    private static LabelledQuery Known(string text, Embedding? embedding) =>
-        new(
-            Guid.NewGuid(),
-            QueryText.Create(text),
-            DatasetSplit.Test,
-            IntentId.Create("card_arrival"),
-            embedding
-        );
-
-    // Every collaborator defaults to an empty fake; a test passes only the ones it inspects.
-    private static ClassifyQueryHandler Handler(
-        InMemoryLabelledQueryRepository? queries = null,
-        InMemoryClassifiedQueryLog? log = null,
-        FakeIntentRepository? intents = null,
-        FakeEmbeddingGenerator? generator = null
-    ) => new(queries ?? new(), log ?? new(), intents ?? new(), generator ?? new());
-
     [Fact]
     public async Task Known_query_reuses_the_stored_embedding_without_generating_one()
     {
@@ -225,4 +208,21 @@ public sealed class ClassifyQueryHandlerTests
             handler.Handle("brand new question", 3)
         );
     }
+
+    private static LabelledQuery Known(string text, Embedding? embedding) =>
+        new(
+            Guid.NewGuid(),
+            QueryText.Create(text),
+            DatasetSplit.Test,
+            IntentId.Create("card_arrival"),
+            embedding
+        );
+
+    // Every collaborator defaults to an empty fake; a test passes only the ones it inspects.
+    private static ClassifyQueryHandler Handler(
+        InMemoryLabelledQueryRepository? queries = null,
+        InMemoryClassifiedQueryLog? log = null,
+        FakeIntentRepository? intents = null,
+        FakeEmbeddingGenerator? generator = null
+    ) => new(queries ?? new(), log ?? new(), intents ?? new(), generator ?? new());
 }

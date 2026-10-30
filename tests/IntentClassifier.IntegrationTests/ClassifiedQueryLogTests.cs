@@ -14,35 +14,6 @@ using Npgsql;
 // writes labelled_queries and must not change PipelineTests' exact row-count assertions.
 public sealed class ClassifiedQueryLogTests(PostgresFixture db) : IClassFixture<PostgresFixture>
 {
-    private T Get<T>()
-        where T : notnull => db.Services!.GetRequiredService<T>();
-
-    private async Task<int> TimesClassified(string queryText)
-    {
-        await using var conn = await Get<NpgsqlDataSource>().OpenConnectionAsync();
-        return await conn.QuerySingleAsync<int>(
-            "SELECT times_classified FROM classified_queries WHERE query_text = @QueryText",
-            new { QueryText = queryText }
-        );
-    }
-
-    private async Task<int> TrainCount()
-    {
-        await using var conn = await Get<NpgsqlDataSource>().OpenConnectionAsync();
-        return await conn.QuerySingleAsync<int>(
-            "SELECT count(*) FROM labelled_queries WHERE split = 'train'"
-        );
-    }
-
-    private async Task<string> TrainIntentId(string queryText)
-    {
-        await using var conn = await Get<NpgsqlDataSource>().OpenConnectionAsync();
-        return await conn.QuerySingleAsync<string>(
-            "SELECT intent_id FROM labelled_queries WHERE split = 'train' AND query_text = @QueryText",
-            new { QueryText = queryText }
-        );
-    }
-
     [Fact]
     public async Task Generated_query_is_logged_and_reused_without_a_second_generator_call()
     {
@@ -70,8 +41,8 @@ public sealed class ClassifiedQueryLogTests(PostgresFixture db) : IClassFixture<
     [Fact]
     public async Task Repeat_record_never_overwrites_the_original_embedding()
     {
+        const int dims = HashingEmbeddingGenerator.Dimensions;
         var text = QueryText.Create("embedding stays put across repeats");
-        var dims = HashingEmbeddingGenerator.Dimensions;
         var first = new Embedding(Enumerable.Repeat(0.1f, dims).ToArray());
         var second = new Embedding(Enumerable.Repeat(0.9f, dims).ToArray());
         var log = Get<IClassifiedQueryLog>();
@@ -187,4 +158,28 @@ public sealed class ClassifiedQueryLogTests(PostgresFixture db) : IClassFixture<
         Assert.Equal("transaction_charged_twice", await TrainIntentId(query));
         Assert.Equal(before + 1, await TrainCount());
     }
+
+    private T Get<T>()
+        where T : notnull => db.Services!.GetRequiredService<T>();
+
+    private async Task<T> Query<T>(string sql, object? param = null)
+    {
+        await using var conn = await Get<NpgsqlDataSource>().OpenConnectionAsync();
+        return await conn.QuerySingleAsync<T>(sql, param);
+    }
+
+    private Task<int> TimesClassified(string queryText) =>
+        Query<int>(
+            "SELECT times_classified FROM classified_queries WHERE query_text = @QueryText",
+            new { QueryText = queryText }
+        );
+
+    private Task<int> TrainCount() =>
+        Query<int>("SELECT count(*) FROM labelled_queries WHERE split = 'train'");
+
+    private Task<string> TrainIntentId(string queryText) =>
+        Query<string>(
+            "SELECT intent_id FROM labelled_queries WHERE split = 'train' AND query_text = @QueryText",
+            new { QueryText = queryText }
+        );
 }

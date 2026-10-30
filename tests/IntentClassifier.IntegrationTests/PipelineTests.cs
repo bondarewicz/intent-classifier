@@ -14,9 +14,6 @@ using Microsoft.Extensions.DependencyInjection;
 // Each stage is its own Fact so a regression names the stage instead of hiding behind one long scenario.
 public sealed class PipelineTests(PostgresFixture db) : IClassFixture<PostgresFixture>
 {
-    private T Get<T>()
-        where T : notnull => db.Services!.GetRequiredService<T>();
-
     [Fact]
     public void Migrations_are_idempotent() => Get<DatabaseMigrator>().MigrateUp();
 
@@ -87,4 +84,7 @@ public sealed class PipelineTests(PostgresFixture db) : IClassFixture<PostgresFi
         Assert.True(centroid.Top1Correct >= 4, $"centroid top-1 was {centroid.Top1Correct}/5");
         Assert.True(centroid.Top3Correct >= centroid.Top1Correct);
     }
+
+    private T Get<T>()
+        where T : notnull => db.Services!.GetRequiredService<T>();
 }
