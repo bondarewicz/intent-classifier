@@ -2,7 +2,6 @@ namespace IntentClassifier.Infrastructure;
 
 using Application.Abstractions;
 using Application.Classification;
-using Application.Evaluation;
 using Application.Queries;
 using Domain.Intents;
 using Domain.Queries;
@@ -40,13 +39,7 @@ public static class DependencyInjection
         services.AddSingleton<ILabelledQueryRepository, LabelledQueryRepository>();
         services.AddSingleton<IClassifiedQueryLog, ClassifiedQueryLog>();
         services.AddSingleton<IIntentCandidateProjection, IntentCandidateProjection>();
-        services.AddSingleton<ClassificationReportQueries>();
-        services.AddSingleton<IClassificationReportQueries>(sp =>
-            sp.GetRequiredService<ClassificationReportQueries>()
-        );
-        services.AddSingleton<IEvaluationQueries>(sp =>
-            sp.GetRequiredService<ClassificationReportQueries>()
-        );
+        services.AddSingleton<IClassificationReportQueries, ClassificationReportQueries>();
         services.AddSingleton<IDatasetImporter, Banking77Importer>();
 
         DatabaseMigrator.AddTo(services);

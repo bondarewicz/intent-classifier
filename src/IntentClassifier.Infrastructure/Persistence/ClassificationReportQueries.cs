@@ -1,15 +1,13 @@
 namespace IntentClassifier.Infrastructure.Persistence;
 
 using Application.Classification;
-using Application.Evaluation;
 using Dapper;
 using Domain.Intents;
 using Domain.Queries;
 using Npgsql;
 
 internal sealed class ClassificationReportQueries(NpgsqlDataSource dataSource)
-    : IClassificationReportQueries,
-        IEvaluationQueries
+    : IClassificationReportQueries
 {
     // Train before test, explicitly - not relying on the alphabetical sort of the split strings.
     public async Task<IReadOnlyList<SplitSummary>> GetSummary(
