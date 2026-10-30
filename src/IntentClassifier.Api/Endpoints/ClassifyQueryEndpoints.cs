@@ -6,17 +6,14 @@ using Microsoft.AspNetCore.Http.HttpResults;
 public static class ClassifyQueryEndpoints
 {
     private const int TopCandidates = 3;
+    private const string Endpoint = "/queries/classify";
 
-    public static IEndpointRouteBuilder MapClassifyQueryEndpoints(this IEndpointRouteBuilder app)
-    {
-        app.MapPost("/queries/classify", Classify)
+    public static void MapClassifyQueryEndpoints(this IEndpointRouteBuilder app) =>
+        app.MapPost(Endpoint, Classify)
             .WithName("ClassifyQuery")
             .WithSummary(
                 "Top 3 Banking77 intents for a raw customer query, by cosine similarity to the intent centroids."
             );
-
-        return app;
-    }
 
     // InvalidQueryException -> 400 and EmbeddingUnavailableException -> 503 are mapped by
     // ClassifyQueryExceptionHandler, so this is the happy path only.
