@@ -45,7 +45,6 @@ internal static class IntentsSchema
             ON CONFLICT (intent_id) DO NOTHING
             """;
 
-        // Centroid = mean of the intent's embedded train queries (pgvector's avg(vector)).
         public static readonly string UpdateCentroids = $"""
             UPDATE {Table} i
             SET centroid_embedding = c.centroid,

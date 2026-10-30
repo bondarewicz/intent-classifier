@@ -16,7 +16,6 @@ public sealed class Intent
 
     public string Name { get; }
 
-    // Embedding of the readable name only.
     public Embedding? NameEmbedding { get; private set; }
 
     public bool HasNameEmbedding => NameEmbedding is not null;

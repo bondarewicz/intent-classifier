@@ -8,7 +8,6 @@ using OpenAI.Embeddings;
 internal sealed class OpenAiEmbeddingGenerator(IOptions<OpenAiOptions> options)
     : IEmbeddingGenerator
 {
-    // OpenAI accepts at most 2048 inputs per request.
     private const int MaxInputsPerRequest = 2048;
 
     private readonly Lazy<EmbeddingClient?> client = new(() =>

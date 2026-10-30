@@ -6,6 +6,5 @@ public enum IntentRepresentation
     // Mean embedding of the intent's train queries (prototype). Default: far more accurate.
     Centroid,
 
-    // Embedding of the intent's readable name only.
     Name,
 }
