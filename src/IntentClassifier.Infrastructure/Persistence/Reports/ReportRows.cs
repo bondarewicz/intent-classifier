@@ -19,12 +19,3 @@ internal sealed class EvaluationRow
     public long Ambiguous { get; set; }
     public long AmbiguousTop1Correct { get; set; }
 }
-
-// Shape of the columns the report queries actually read from the query_classification_report view.
-internal sealed class QueryClassificationReportRow
-{
-    public string Split { get; set; } = "";
-    public double BestSimilarity { get; set; }
-    public double Margin { get; set; }
-    public bool IsCorrect { get; set; }
-}

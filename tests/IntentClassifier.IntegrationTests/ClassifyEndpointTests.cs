@@ -15,6 +15,7 @@ public sealed class ClassifyEndpointTests(PostgresFixture db) : IClassFixture<Po
     // A closed local port: Npgsql gets an immediate connection-refused, no timeout to wait out.
     private const string UnreachableConnectionString =
         "Host=127.0.0.1;Port=1;Database=x;Username=x;Password=x;Pooling=false";
+    private const string Endpoint = "/queries/classify";
 
     [Fact]
     public async Task Classify_returns_ranked_candidates_for_a_known_query()
@@ -22,7 +23,7 @@ public sealed class ClassifyEndpointTests(PostgresFixture db) : IClassFixture<Po
         using var api = CreateApi(swapGenerator: true);
 
         var response = await api.Client.PostAsJsonAsync(
-            "/queries/classify",
+            Endpoint,
             new ClassifyQueryRequest("My card has NOT arrived yet")
         );
 
@@ -37,10 +38,7 @@ public sealed class ClassifyEndpointTests(PostgresFixture db) : IClassFixture<Po
     {
         using var api = CreateApi(swapGenerator: true);
 
-        var response = await api.Client.PostAsJsonAsync(
-            "/queries/classify",
-            new ClassifyQueryRequest("   ")
-        );
+        var response = await api.Client.PostAsJsonAsync(Endpoint, new ClassifyQueryRequest("   "));
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
@@ -52,7 +50,7 @@ public sealed class ClassifyEndpointTests(PostgresFixture db) : IClassFixture<Po
         using var api = CreateApi(swapGenerator: false);
 
         var response = await api.Client.PostAsJsonAsync(
-            "/queries/classify",
+            Endpoint,
             new ClassifyQueryRequest("a brand new question never seen before")
         );
 
@@ -69,7 +67,7 @@ public sealed class ClassifyEndpointTests(PostgresFixture db) : IClassFixture<Po
         );
 
         var response = await api.Client.PostAsJsonAsync(
-            "/queries/classify",
+            Endpoint,
             new ClassifyQueryRequest("where is the virtual card?")
         );
 

@@ -10,5 +10,4 @@ internal sealed class LabelledQueryRow
     public string QueryText { get; set; } = "";
     public string IntentId { get; set; } = "";
     public Vector? Embedding { get; set; }
-    public DateTime? EmbeddedAt { get; set; }
 }

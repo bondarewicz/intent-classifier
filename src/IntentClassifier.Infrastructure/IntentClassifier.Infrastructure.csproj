@@ -5,7 +5,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Lets the integration tests reconcile Row classes against information_schema. -->
+    <!-- Lets the integration tests read DbNames.VectorDimensions for the fake embedder. -->
     <InternalsVisibleTo Include="IntentClassifier.IntegrationTests" />
   </ItemGroup>
 

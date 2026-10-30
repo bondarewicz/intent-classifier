@@ -75,7 +75,7 @@ internal sealed class IntentRepository(NpgsqlDataSource dataSource) : IIntentRep
 internal static class IntentRowExtensions
 {
     public static Intent MapToIntent(this IntentRow row) =>
-        new(IntentId.Create(row.IntentId), row.IntentName, row.NameEmbedding?.ToEmbedding());
+        new(IntentId.Create(row.IntentId), row.IntentName);
 
     public static IntentCandidate MapToIntentCandidate(this IntentCandidateRow row) =>
         new(row.Rank, IntentId.Create(row.IntentId), row.IntentName, row.Similarity);

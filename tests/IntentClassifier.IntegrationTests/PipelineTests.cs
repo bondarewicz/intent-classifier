@@ -11,8 +11,8 @@ using Domain.Queries;
 using Microsoft.Extensions.DependencyInjection;
 
 // Runs the real migrations, COPY import, Dapper repositories and pgvector SQL end to end, against
-// the dataset PostgresFixture seeds, embeds and trains once in InitializeAsync. Each stage is its
-// own Fact so a regression names the stage instead of hiding behind one long scenario.
+// the dataset PostgresFixture seeds, embeds and trains once in InitializeAsync.
+// Each stage is its own Fact so a regression names the stage instead of hiding behind one long scenario.
 public sealed class PipelineTests(PostgresFixture db) : IClassFixture<PostgresFixture>
 {
     private T Get<T>()
