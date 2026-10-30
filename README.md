@@ -13,6 +13,38 @@ On the held-out Banking77 test split (3,079 queries):
 \* best intent less than 0.02 ahead of the runner-up (`ClassificationConfidence.AmbiguousMargin`). Top-1 drops to
 49.8% on ambiguous classifications vs 92.9% on confident ones - that is where a second opinion (e.g. an LLM) would pay off.
 
+## How it works
+
+**Build once.** Five CLI commands, in order:
+
+| Step | Command | What it does | Writes to |
+|---|---|---|---|
+| 1 | `seed` | Loads the Banking77 CSVs: ~13k example queries, 77 intents | `labelled_queries`, `intents` |
+| 2 | `embed` | Gets an OpenAI vector for every query and every intent name (< 1 cent) | same tables, embedding column |
+| 3 | `train` | Averages each intent's train-query vectors into one point per intent (its *centroid*) | `intents` |
+| 4 | `classify-all` | Ranks the top 5 intents for every stored query, accuracy per split | `query_intent_candidates` |
+| 5 | `evaluate` | Scores the test split, centroid vs name: top-1, top-3, ambiguous | nothing, prints only |
+
+**Classify a query.** `POST /queries/classify` and `classify` run the same steps:
+
+```mermaid
+flowchart TD
+  q["Customer query<br/>(API or CLI)"] --> n["Normalize text"]
+  n --> k{"Seen this text before?"}
+  k -- "yes" --> s["Reuse stored vector"]
+  k -- "no" --> g["Get vector from OpenAI"]
+  s --> r["Rank the 77 intents by<br/>cosine similarity to their centroid"]
+  g --> r
+  r --> a{"Top two within 0.02<br/>of each other?"}
+  a -- "yes" --> amb["Too close to call<br/>(ambiguous)"]
+  a -- "no" --> conf["Clear winner"]
+  amb --> log[("Log in classified_queries")]
+  conf --> log
+  log --> resp["Return top candidates"]
+  log -. "label: human confirms intent" .-> lab["Added to train examples"]
+  lab -. "train" .-> cen["Centroids recomputed"]
+```
+
 ## Dataset
 
 Banking77 by PolyAI, from
