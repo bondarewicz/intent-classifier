@@ -1,8 +1,8 @@
 namespace IntentClassifier.Infrastructure.Persistence.IntentCandidates;
 
+using Application.Classification;
 using Dapper;
-using IntentClassifier.Application.Classification;
-using IntentClassifier.Domain.Intents;
+using Domain.Intents;
 using Npgsql;
 
 internal sealed class IntentCandidateProjection(NpgsqlDataSource dataSource)

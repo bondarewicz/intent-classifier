@@ -1,7 +1,7 @@
 namespace IntentClassifier.Application.Queries;
 
-using IntentClassifier.Domain.Intents;
-using IntentClassifier.Domain.Queries;
+using Domain.Intents;
+using Domain.Queries;
 
 public sealed record ConfirmLabelResult(QueryText Text, IntentId IntentId);
 

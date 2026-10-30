@@ -1,7 +1,7 @@
 namespace IntentClassifier.Application.Evaluation;
 
-using IntentClassifier.Domain.Intents;
-using IntentClassifier.Domain.Queries;
+using Domain.Intents;
+using Domain.Queries;
 
 public sealed record EvaluationResult(
     IntentRepresentation Representation,

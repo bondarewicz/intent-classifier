@@ -75,7 +75,7 @@ catch (Exception e)
                 or FormatException
                 or IOException
                 or System.ClientModel.ClientResultException
-                or System.Net.Http.HttpRequestException
+                or HttpRequestException
     )
 {
     Console.Error.WriteLine(e.Message);

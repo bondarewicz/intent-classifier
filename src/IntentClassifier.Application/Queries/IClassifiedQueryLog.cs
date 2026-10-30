@@ -1,8 +1,8 @@
 namespace IntentClassifier.Application.Queries;
 
-using IntentClassifier.Domain.Embeddings;
-using IntentClassifier.Domain.Intents;
-using IntentClassifier.Domain.Queries;
+using Domain.Embeddings;
+using Domain.Intents;
+using Domain.Queries;
 
 // Cache and audit trail of classify calls, keyed by normalized text. The embedding is written
 // once; Record refreshes the rest on every repeat.

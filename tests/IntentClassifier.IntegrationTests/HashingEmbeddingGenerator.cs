@@ -1,8 +1,8 @@
 namespace IntentClassifier.IntegrationTests;
 
-using IntentClassifier.Application.Abstractions;
-using IntentClassifier.Domain.Embeddings;
-using IntentClassifier.Infrastructure.Persistence.Migrations;
+using Application.Abstractions;
+using Domain.Embeddings;
+using Infrastructure.Persistence.Migrations;
 
 // Deterministic stand-in for OpenAI: a bag-of-words hashed into the database's vector dimension,
 // so texts sharing words are close in cosine space. Lets the real SQL/pgvector pipeline run
@@ -34,10 +34,7 @@ internal sealed class HashingEmbeddingGenerator : IEmbeddingGenerator
     {
         unchecked
         {
-            var hash = (int)2166136261;
-            foreach (var c in s)
-                hash = (hash ^ c) * 16777619;
-            return hash;
+            return s.Aggregate((int)2166136261, (current, c) => (current ^ c) * 16777619);
         }
     }
 }

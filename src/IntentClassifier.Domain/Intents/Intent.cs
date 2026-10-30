@@ -1,6 +1,6 @@
 namespace IntentClassifier.Domain.Intents;
 
-using IntentClassifier.Domain.Embeddings;
+using Embeddings;
 
 public sealed class Intent
 {

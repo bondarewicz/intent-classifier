@@ -1,7 +1,7 @@
 namespace IntentClassifier.Infrastructure.Persistence.Intents;
 
-using IntentClassifier.Domain.Intents;
-using IntentClassifier.Infrastructure.Persistence.LabelledQueries;
+using Domain.Intents;
+using LabelledQueries;
 
 internal static class IntentsSchema
 {

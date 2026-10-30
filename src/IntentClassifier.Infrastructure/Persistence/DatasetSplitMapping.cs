@@ -1,6 +1,6 @@
 namespace IntentClassifier.Infrastructure.Persistence;
 
-using IntentClassifier.Domain.Queries;
+using Domain.Queries;
 
 internal static class DatasetSplitMapping
 {

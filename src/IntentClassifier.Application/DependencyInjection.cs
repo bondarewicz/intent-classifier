@@ -1,11 +1,11 @@
 namespace IntentClassifier.Application;
 
-using IntentClassifier.Application.Classification;
-using IntentClassifier.Application.Embeddings;
-using IntentClassifier.Application.Evaluation;
-using IntentClassifier.Application.Intents;
-using IntentClassifier.Application.Queries;
+using Classification;
+using Embeddings;
+using Evaluation;
+using Intents;
 using Microsoft.Extensions.DependencyInjection;
+using Queries;
 
 public static class DependencyInjection
 {

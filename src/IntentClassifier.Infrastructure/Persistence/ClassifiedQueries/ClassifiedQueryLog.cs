@@ -1,12 +1,12 @@
 namespace IntentClassifier.Infrastructure.Persistence.ClassifiedQueries;
 
+using Application.Queries;
 using Dapper;
-using IntentClassifier.Application.Queries;
-using IntentClassifier.Domain.Embeddings;
-using IntentClassifier.Domain.Intents;
-using IntentClassifier.Domain.Queries;
-using IntentClassifier.Infrastructure.Persistence.Intents;
-using IntentClassifier.Infrastructure.Persistence.LabelledQueries;
+using Domain.Embeddings;
+using Domain.Intents;
+using Domain.Queries;
+using Intents;
+using LabelledQueries;
 using Npgsql;
 using Pgvector;
 

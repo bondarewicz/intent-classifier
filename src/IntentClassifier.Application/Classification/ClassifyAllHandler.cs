@@ -1,7 +1,7 @@
 namespace IntentClassifier.Application.Classification;
 
-using IntentClassifier.Domain.Classification;
-using IntentClassifier.Domain.Intents;
+using Domain.Classification;
+using Domain.Intents;
 
 public sealed record ClassifyAllResult(long RowsStored, IReadOnlyList<SplitSummary> Summary);
 

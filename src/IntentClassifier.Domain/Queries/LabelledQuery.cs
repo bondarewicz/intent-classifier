@@ -1,7 +1,7 @@
 namespace IntentClassifier.Domain.Queries;
 
-using IntentClassifier.Domain.Embeddings;
-using IntentClassifier.Domain.Intents;
+using Embeddings;
+using Intents;
 
 // A customer query from the dataset with its known (human-labelled) intent.
 public sealed class LabelledQuery(

@@ -1,9 +1,9 @@
 namespace IntentClassifier.Application.Embeddings;
 
-using IntentClassifier.Application.Abstractions;
-using IntentClassifier.Domain.Embeddings;
-using IntentClassifier.Domain.Intents;
-using IntentClassifier.Domain.Queries;
+using Abstractions;
+using Domain.Embeddings;
+using Domain.Intents;
+using Domain.Queries;
 
 public sealed record EmbedDatasetProgress(string Stage, int Embedded, int Total);
 

@@ -1,8 +1,8 @@
 namespace IntentClassifier.Application.Evaluation;
 
-using IntentClassifier.Domain.Classification;
-using IntentClassifier.Domain.Intents;
-using IntentClassifier.Domain.Queries;
+using Domain.Classification;
+using Domain.Intents;
+using Domain.Queries;
 
 // Accuracy of each intent representation on the held-out test split.
 public sealed class EvaluateHandler(IEvaluationQueries evaluation)

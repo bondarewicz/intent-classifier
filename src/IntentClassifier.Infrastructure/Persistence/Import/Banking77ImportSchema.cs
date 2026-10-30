@@ -1,7 +1,7 @@
 namespace IntentClassifier.Infrastructure.Persistence.Import;
 
-using IntentClassifier.Infrastructure.Persistence.Intents;
-using IntentClassifier.Infrastructure.Persistence.LabelledQueries;
+using Intents;
+using LabelledQueries;
 
 // Staging for the Banking77 CSVs (text,category): COPY loads them, then the domain types
 // normalize and validate each row before insert.

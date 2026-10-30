@@ -1,23 +1,23 @@
 namespace IntentClassifier.Infrastructure;
 
-using IntentClassifier.Application.Abstractions;
-using IntentClassifier.Application.Classification;
-using IntentClassifier.Application.Evaluation;
-using IntentClassifier.Application.Queries;
-using IntentClassifier.Domain.Intents;
-using IntentClassifier.Domain.Queries;
-using IntentClassifier.Infrastructure.Embeddings;
-using IntentClassifier.Infrastructure.Persistence;
-using IntentClassifier.Infrastructure.Persistence.ClassifiedQueries;
-using IntentClassifier.Infrastructure.Persistence.Import;
-using IntentClassifier.Infrastructure.Persistence.IntentCandidates;
-using IntentClassifier.Infrastructure.Persistence.Intents;
-using IntentClassifier.Infrastructure.Persistence.LabelledQueries;
-using IntentClassifier.Infrastructure.Persistence.Reports;
+using Application.Abstractions;
+using Application.Classification;
+using Application.Evaluation;
+using Application.Queries;
+using Domain.Intents;
+using Domain.Queries;
+using Embeddings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Npgsql;
+using Persistence;
+using Persistence.ClassifiedQueries;
+using Persistence.Import;
+using Persistence.IntentCandidates;
+using Persistence.Intents;
+using Persistence.LabelledQueries;
+using Persistence.Reports;
 
 public static class DependencyInjection
 {

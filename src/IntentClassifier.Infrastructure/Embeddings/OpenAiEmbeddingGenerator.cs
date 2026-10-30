@@ -1,7 +1,7 @@
 namespace IntentClassifier.Infrastructure.Embeddings;
 
-using IntentClassifier.Application.Abstractions;
-using IntentClassifier.Domain.Embeddings;
+using Application.Abstractions;
+using Domain.Embeddings;
 using Microsoft.Extensions.Options;
 using OpenAI.Embeddings;
 

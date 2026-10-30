@@ -1,7 +1,7 @@
 namespace IntentClassifier.Domain.Intents;
 
-using IntentClassifier.Domain.Classification;
-using IntentClassifier.Domain.Embeddings;
+using Classification;
+using Embeddings;
 
 public interface IIntentRepository
 {

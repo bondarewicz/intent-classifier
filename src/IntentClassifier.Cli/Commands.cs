@@ -1,11 +1,11 @@
 namespace IntentClassifier.Cli;
 
-using IntentClassifier.Application.Abstractions;
-using IntentClassifier.Application.Classification;
-using IntentClassifier.Application.Embeddings;
-using IntentClassifier.Application.Evaluation;
-using IntentClassifier.Application.Intents;
-using IntentClassifier.Application.Queries;
+using Application.Abstractions;
+using Application.Classification;
+using Application.Embeddings;
+using Application.Evaluation;
+using Application.Intents;
+using Application.Queries;
 using Microsoft.Extensions.DependencyInjection;
 
 internal static class Commands

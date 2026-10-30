@@ -1,6 +1,6 @@
 namespace IntentClassifier.Application.Abstractions;
 
-using IntentClassifier.Domain.Embeddings;
+using Domain.Embeddings;
 
 public interface IEmbeddingGenerator
 {

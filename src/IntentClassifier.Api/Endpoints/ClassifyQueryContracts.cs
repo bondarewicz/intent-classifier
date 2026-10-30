@@ -1,6 +1,6 @@
 namespace IntentClassifier.Api.Endpoints;
 
-using IntentClassifier.Application.Queries;
+using Application.Queries;
 
 public sealed record ClassifyQueryRequest(string? Query);
 

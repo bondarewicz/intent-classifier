@@ -1,9 +1,9 @@
 namespace IntentClassifier.Infrastructure.Persistence.Intents;
 
 using Dapper;
-using IntentClassifier.Domain.Classification;
-using IntentClassifier.Domain.Embeddings;
-using IntentClassifier.Domain.Intents;
+using Domain.Classification;
+using Domain.Embeddings;
+using Domain.Intents;
 using Npgsql;
 
 internal sealed class IntentRepository(NpgsqlDataSource dataSource) : IIntentRepository

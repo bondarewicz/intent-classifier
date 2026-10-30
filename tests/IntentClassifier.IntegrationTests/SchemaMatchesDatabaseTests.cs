@@ -3,11 +3,11 @@ namespace IntentClassifier.IntegrationTests;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using Dapper;
-using IntentClassifier.Infrastructure.Persistence.ClassifiedQueries;
-using IntentClassifier.Infrastructure.Persistence.IntentCandidates;
-using IntentClassifier.Infrastructure.Persistence.Intents;
-using IntentClassifier.Infrastructure.Persistence.LabelledQueries;
-using IntentClassifier.Infrastructure.Persistence.Reports;
+using Infrastructure.Persistence.ClassifiedQueries;
+using Infrastructure.Persistence.IntentCandidates;
+using Infrastructure.Persistence.Intents;
+using Infrastructure.Persistence.LabelledQueries;
+using Infrastructure.Persistence.Reports;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 

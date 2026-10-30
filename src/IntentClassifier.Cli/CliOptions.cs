@@ -1,6 +1,6 @@
 namespace IntentClassifier.Cli;
 
-using IntentClassifier.Domain.Intents;
+using Domain.Intents;
 
 internal sealed record CliOptions(
     string Command,

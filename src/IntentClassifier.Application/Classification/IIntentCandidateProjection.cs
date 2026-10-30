@@ -1,6 +1,6 @@
 namespace IntentClassifier.Application.Classification;
 
-using IntentClassifier.Domain.Intents;
+using Domain.Intents;
 
 // Rebuilds the stored top-K intent candidates for every query in the dataset.
 public interface IIntentCandidateProjection

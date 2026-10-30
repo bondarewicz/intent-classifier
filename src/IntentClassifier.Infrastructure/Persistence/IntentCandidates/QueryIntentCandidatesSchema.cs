@@ -1,8 +1,8 @@
 namespace IntentClassifier.Infrastructure.Persistence.IntentCandidates;
 
-using IntentClassifier.Domain.Intents;
-using IntentClassifier.Infrastructure.Persistence.Intents;
-using IntentClassifier.Infrastructure.Persistence.LabelledQueries;
+using Domain.Intents;
+using Intents;
+using LabelledQueries;
 
 internal static class QueryIntentCandidatesSchema
 {

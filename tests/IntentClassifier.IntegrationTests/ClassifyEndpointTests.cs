@@ -2,9 +2,8 @@ namespace IntentClassifier.IntegrationTests;
 
 using System.Net;
 using System.Net.Http.Json;
-using IntentClassifier.Api.Endpoints;
-using IntentClassifier.Application.Abstractions;
-using Microsoft.AspNetCore.Hosting;
+using Api.Endpoints;
+using Application.Abstractions;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

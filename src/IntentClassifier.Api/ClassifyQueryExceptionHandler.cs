@@ -1,7 +1,7 @@
 namespace IntentClassifier.Api;
 
-using IntentClassifier.Application.Abstractions;
-using IntentClassifier.Domain.Queries;
+using Application.Abstractions;
+using Domain.Queries;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
@@ -30,13 +30,12 @@ internal sealed class ClassifyQueryExceptionHandler(IProblemDetailsService probl
                 Detail =
                     "Query is not in the dataset and no OpenAI API key is configured to embed it.",
             },
-            System.ClientModel.ClientResultException or System.Net.Http.HttpRequestException =>
-                new ProblemDetails
-                {
-                    Status = StatusCodes.Status503ServiceUnavailable,
-                    // Not exception.Message: OpenAI echoes part of the API key on a 401.
-                    Detail = "The embedding service failed. Try again later.",
-                },
+            System.ClientModel.ClientResultException or HttpRequestException => new ProblemDetails
+            {
+                Status = StatusCodes.Status503ServiceUnavailable,
+                // Not exception.Message: OpenAI echoes part of the API key on a 401.
+                Detail = "The embedding service failed. Try again later.",
+            },
             _ => null,
         };
 

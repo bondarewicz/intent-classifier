@@ -1,11 +1,11 @@
 namespace IntentClassifier.IntegrationTests;
 
+using Application.Intents;
+using Application.Queries;
 using Dapper;
-using IntentClassifier.Application.Intents;
-using IntentClassifier.Application.Queries;
-using IntentClassifier.Domain.Embeddings;
-using IntentClassifier.Domain.Intents;
-using IntentClassifier.Domain.Queries;
+using Domain.Embeddings;
+using Domain.Intents;
+using Domain.Queries;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 

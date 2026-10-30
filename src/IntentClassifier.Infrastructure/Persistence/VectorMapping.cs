@@ -1,8 +1,8 @@
 namespace IntentClassifier.Infrastructure.Persistence;
 
 using System.Globalization;
-using IntentClassifier.Domain.Embeddings;
-using IntentClassifier.Infrastructure.Persistence.Migrations;
+using Domain.Embeddings;
+using Migrations;
 using Pgvector;
 
 internal static class VectorMapping

@@ -1,10 +1,10 @@
 namespace IntentClassifier.IntegrationTests;
 
-using IntentClassifier.Application;
-using IntentClassifier.Application.Abstractions;
-using IntentClassifier.Application.Embeddings;
-using IntentClassifier.Application.Intents;
-using IntentClassifier.Infrastructure;
+using Application;
+using Application.Abstractions;
+using Application.Embeddings;
+using Application.Intents;
+using Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Testcontainers.PostgreSql;

@@ -1,8 +1,8 @@
 namespace IntentClassifier.Infrastructure.Persistence.LabelledQueries;
 
 using Dapper;
-using IntentClassifier.Domain.Intents;
-using IntentClassifier.Domain.Queries;
+using Domain.Intents;
+using Domain.Queries;
 using Npgsql;
 
 internal sealed class LabelledQueryRepository(NpgsqlDataSource dataSource)

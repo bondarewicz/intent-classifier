@@ -1,11 +1,11 @@
 namespace IntentClassifier.Infrastructure.Persistence.Import;
 
+using Application.Abstractions;
 using Dapper;
-using IntentClassifier.Application.Abstractions;
-using IntentClassifier.Domain.Intents;
-using IntentClassifier.Domain.Queries;
-using IntentClassifier.Infrastructure.Persistence.Intents;
-using IntentClassifier.Infrastructure.Persistence.LabelledQueries;
+using Domain.Intents;
+using Domain.Queries;
+using Intents;
+using LabelledQueries;
 using Npgsql;
 
 // Streams the CSVs into a temp stage with COPY FROM STDIN (client side, nothing mounted into the

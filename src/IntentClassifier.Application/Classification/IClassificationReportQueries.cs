@@ -1,6 +1,6 @@
 namespace IntentClassifier.Application.Classification;
 
-using IntentClassifier.Domain.Queries;
+using Domain.Queries;
 
 public sealed record SplitSummary(
     DatasetSplit Split,

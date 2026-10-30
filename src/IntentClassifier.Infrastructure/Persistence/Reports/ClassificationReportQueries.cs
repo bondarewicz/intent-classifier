@@ -1,10 +1,10 @@
 namespace IntentClassifier.Infrastructure.Persistence.Reports;
 
+using Application.Classification;
+using Application.Evaluation;
 using Dapper;
-using IntentClassifier.Application.Classification;
-using IntentClassifier.Application.Evaluation;
-using IntentClassifier.Domain.Intents;
-using IntentClassifier.Domain.Queries;
+using Domain.Intents;
+using Domain.Queries;
 using Npgsql;
 
 internal sealed class ClassificationReportQueries(NpgsqlDataSource dataSource)
