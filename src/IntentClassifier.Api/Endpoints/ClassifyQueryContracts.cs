@@ -2,8 +2,8 @@ namespace IntentClassifier.Api.Endpoints;
 
 using Application.Classification;
 
-// Top is how many candidates to return; omitted means 3.
-public sealed record ClassifyQueryRequest(string? Query, int? Top = null);
+// Top is how many candidates to return when the JSON leaves it out.
+public sealed record ClassifyQueryRequest(string? Query, int Top = 3);
 
 public sealed record IntentCandidateResponse(
     int Rank,

@@ -48,6 +48,20 @@ public sealed class ClassifyEndpointTests(PostgresFixture db) : IClassFixture<Po
     }
 
     [Fact]
+    public async Task Omitted_top_means_three_candidates()
+    {
+        using var api = CreateApi(swapGenerator: true);
+
+        var response = await api.Client.PostAsJsonAsync(
+            Endpoint,
+            new { query = "My card has NOT arrived yet" }
+        );
+
+        var body = await response.Content.ReadFromJsonAsync<ClassifyQueryResponse>();
+        Assert.Equal(3, body!.Candidates.Count);
+    }
+
+    [Fact]
     public async Task Top_below_one_is_a_validation_problem()
     {
         using var api = CreateApi(swapGenerator: true);

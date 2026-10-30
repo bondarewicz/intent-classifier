@@ -5,14 +5,13 @@ using Microsoft.AspNetCore.Http.HttpResults;
 
 public static class ClassifyQueryEndpoints
 {
-    private const int DefaultTop = 3;
     private const string Endpoint = "/queries/classify";
 
     public static void MapClassifyQueryEndpoints(this IEndpointRouteBuilder app) =>
         app.MapPost(Endpoint, Classify)
             .WithName("ClassifyQuery")
             .WithSummary(
-                "Closest Banking77 intents for a raw customer query, by cosine similarity to the intent centroids; top (default 3) sets how many."
+                "Closest Banking77 intents for a raw customer query, by cosine similarity to the intent centroids; top sets how many."
             );
 
     // InvalidQueryException -> 400 and EmbeddingUnavailableException -> 503 are mapped by
@@ -24,13 +23,12 @@ public static class ClassifyQueryEndpoints
         CancellationToken ct
     )
     {
-        var top = request.Top ?? DefaultTop;
-        if (top < 1)
+        if (request.Top < 1)
             return TypedResults.ValidationProblem(
                 new Dictionary<string, string[]> { ["top"] = ["top must be at least 1."] }
             );
 
-        var result = await handler.Handle(request.Query ?? string.Empty, top, ct: ct);
+        var result = await handler.Handle(request.Query ?? string.Empty, request.Top, ct: ct);
         return TypedResults.Ok(ClassifyQueryResponse.From(result));
     }
 }
